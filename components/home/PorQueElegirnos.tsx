@@ -5,7 +5,6 @@ import { WA_TURNO } from '@/lib/data'
 
 const puntos = [
   {
-    num: '01',
     titulo: 'Más de 35 especialidades',
     descripcion: 'Todo lo que necesitás en un solo lugar. Desde clínica médica hasta neurología infantil.',
     icon: (
@@ -15,7 +14,6 @@ const puntos = [
     ),
   },
   {
-    num: '02',
     titulo: 'Fácil acceso',
     descripcion: 'En el corazón de Los Polvorines con rampa de acceso. Fácil estacionamiento en la zona.',
     icon: (
@@ -26,7 +24,6 @@ const puntos = [
     ),
   },
   {
-    num: '03',
     titulo: 'Atención personalizada',
     descripcion: 'Profesionales comprometidos con tu salud. Tratamos a cada paciente con calidez y dedicación.',
     icon: (
@@ -36,7 +33,6 @@ const puntos = [
     ),
   },
   {
-    num: '04',
     titulo: 'Turno online 24hs',
     descripcion: 'Escribinos por WhatsApp cuando quieras. Respondemos a la brevedad en horario de atención.',
     icon: (
@@ -133,11 +129,6 @@ export default function PorQueElegirnos() {
               }
               className="relative bg-white/8 border border-white/10 rounded-2xl p-7 backdrop-blur-sm hover:bg-white/12 hover:border-[#56B4E9]/30 transition-all duration-300 group overflow-hidden"
             >
-              {/* Decorative number */}
-              <span className="absolute top-4 right-5 text-white/5 text-7xl font-black leading-none select-none pointer-events-none">
-                {p.num}
-              </span>
-
               {/* Icon */}
               <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#56B4E9]/30 to-[#1E6BC6]/30 border border-[#56B4E9]/20 flex items-center justify-center text-[#56B4E9] mb-5 group-hover:from-[#56B4E9]/40 group-hover:to-[#1E6BC6]/40 transition-all duration-300">
                 {p.icon}
