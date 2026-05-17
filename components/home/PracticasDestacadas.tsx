@@ -1,8 +1,8 @@
 'use client'
 import React from 'react'
 import Link from 'next/link'
-import { useRef } from 'react'
-import { motion, useInView, useReducedMotion } from 'motion/react'
+import { motion, useReducedMotion } from 'motion/react'
+import AnimateIn from '@/components/AnimateIn'
 import { practicasDestacadas } from '@/lib/data'
 
 const icons: Record<string, React.ReactNode> = {
@@ -39,31 +39,13 @@ const icons: Record<string, React.ReactNode> = {
 }
 
 export default function PracticasDestacadas() {
-  const ref = useRef(null)
-  const isInView = useInView(ref, { once: true, margin: '-60px' })
   const shouldReduce = useReducedMotion()
-
   const spring = { type: 'spring' as const, stiffness: 65, damping: 18 }
-
-  const container = {
-    hidden: {},
-    show: { transition: { staggerChildren: shouldReduce ? 0 : 0.08, delayChildren: 0.05 } },
-  }
-  const item = {
-    hidden: shouldReduce ? {} : { opacity: 0, x: -20 },
-    show: { opacity: 1, x: 0, transition: spring },
-  }
 
   return (
     <section className="py-24 md:py-32 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <motion.div
-          initial={shouldReduce ? {} : { opacity: 0, y: 24 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={spring}
-          className="text-center mb-14"
-        >
+        <AnimateIn direction="up" className="text-center mb-14">
           <span className="inline-block text-[#1E6BC6] text-sm font-semibold uppercase tracking-widest mb-4">
             Estudios y procedimientos
           </span>
@@ -73,69 +55,43 @@ export default function PracticasDestacadas() {
           <p className="text-[#6B7280] text-base md:text-lg max-w-lg mx-auto leading-relaxed">
             Realizamos estudios y procedimientos sin que tengas que ir a otro lado.
           </p>
-        </motion.div>
+        </AnimateIn>
 
-        <motion.div
-          ref={ref}
-          variants={container}
-          initial="hidden"
-          animate={isInView ? 'show' : 'hidden'}
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
-        >
-          {practicasDestacadas.map((practica) => (
-            <motion.div
-              key={practica}
-              variants={item}
-              whileHover={
-                shouldReduce
-                  ? {}
-                  : {
-                      x: 4,
-                      transition: { type: 'spring', stiffness: 400, damping: 20 },
-                    }
-              }
-              className="group flex items-center gap-4 bg-[#F4F6F9] hover:bg-gradient-to-r hover:from-[#F0F7FF] hover:to-[#F4F6F9] border border-transparent hover:border-[#1E6BC6]/15 rounded-xl p-5 transition-all duration-250 cursor-default"
-            >
-              <div className="shrink-0 w-12 h-12 bg-white rounded-xl flex items-center justify-center text-[#1E6BC6] shadow-sm group-hover:shadow-md group-hover:text-[#0A2463] transition-all duration-250">
-                {icons[practica] ?? (
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.8}>
-                    <path strokeLinecap="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                  </svg>
-                )}
-              </div>
-              <div className="flex-1">
-                <p className="font-semibold text-[#0A2463] text-sm md:text-base leading-snug">{practica}</p>
-              </div>
-              <svg
-                className="w-4 h-4 text-[#1E6BC6]/40 group-hover:text-[#1E6BC6] group-hover:translate-x-1 transition-all duration-200 shrink-0"
-                fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}
+        {/* Cards — stagger 0.08s */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {practicasDestacadas.map((practica, i) => (
+            <AnimateIn key={practica} direction="up" delay={i * 0.08}>
+              <motion.div
+                whileHover={shouldReduce ? {} : { x: 4, transition: { type: 'spring', stiffness: 400, damping: 20 } }}
+                className="group flex items-center gap-4 bg-[#F4F6F9] hover:bg-gradient-to-r hover:from-[#F0F7FF] hover:to-[#F4F6F9] border border-transparent hover:border-[#1E6BC6]/15 rounded-xl p-5 transition-all duration-250 cursor-default"
               >
-                <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-              </svg>
-            </motion.div>
+                <div className="shrink-0 w-12 h-12 bg-white rounded-xl flex items-center justify-center text-[#1E6BC6] shadow-sm group-hover:shadow-md group-hover:text-[#0A2463] transition-all duration-250">
+                  {icons[practica] ?? (
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.8}>
+                      <path strokeLinecap="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                    </svg>
+                  )}
+                </div>
+                <p className="flex-1 font-semibold text-[#0A2463] text-sm md:text-base leading-snug">{practica}</p>
+                <svg className="w-4 h-4 text-[#1E6BC6]/40 group-hover:text-[#1E6BC6] group-hover:translate-x-1 transition-all duration-200 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                </svg>
+              </motion.div>
+            </AnimateIn>
           ))}
-        </motion.div>
+        </div>
 
-        <motion.div
-          initial={shouldReduce ? {} : { opacity: 0, y: 16 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ ...spring, delay: 0.3 }}
-          className="text-center mt-12"
-        >
+        <AnimateIn direction="up" delay={0.3} className="text-center mt-12">
           <Link
             href="/practicas"
             className="inline-flex items-center gap-2 text-[#1E6BC6] font-bold hover:text-[#0A2463] transition-colors duration-200 cursor-pointer group"
           >
             Ver todas las prácticas
-            <svg
-              className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-200"
-              fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}
-            >
+            <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
             </svg>
           </Link>
-        </motion.div>
+        </AnimateIn>
       </div>
     </section>
   )

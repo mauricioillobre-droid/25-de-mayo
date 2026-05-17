@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 
 export default function PracticasPage() {
   return (
-    <div className="min-h-screen bg-[#F8FBFF]">
+    <div className="min-h-screen bg-white">
       <PageHero
         eyebrow="ESTUDIOS Y PROCEDIMIENTOS"
         title="Prácticas y estudios"

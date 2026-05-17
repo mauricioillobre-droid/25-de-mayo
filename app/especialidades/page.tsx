@@ -2,8 +2,9 @@
 import { useState, useRef, useEffect } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { motion, AnimatePresence, useReducedMotion, useInView } from 'motion/react'
+import { motion, AnimatePresence, useReducedMotion } from 'motion/react'
 import PageHero from '@/components/PageHero'
+import AnimateIn from '@/components/AnimateIn'
 import { especialidades } from '@/lib/data'
 
 const WA_BASE = 'https://wa.me/5491122355689'
@@ -54,15 +55,7 @@ export default function EspecialidadesPage() {
   const [isOpen, setIsOpen] = useState(false)
   const shouldReduce = useReducedMotion()
   const dropdownRef = useRef<HTMLDivElement>(null)
-  const rightColRef = useRef(null)
-  const inView = useInView(rightColRef, { once: true, margin: '-60px' })
-
   const spring = { type: 'spring' as const, stiffness: 68, damping: 18 }
-  const fadeUp = (delay = 0) => ({
-    initial: shouldReduce ? {} : { opacity: 0, y: 20 },
-    animate: inView ? { opacity: 1, y: 0 } : {},
-    transition: { ...spring, delay },
-  })
 
   // Close dropdown on outside click
   useEffect(() => {
@@ -108,7 +101,7 @@ export default function EspecialidadesPage() {
         <div className="lg:grid lg:grid-cols-2 lg:gap-20 items-start">
 
           {/* ── LEFT: sticky image only ── */}
-          <div className="lg:sticky lg:top-28 lg:self-start mb-14 lg:mb-0">
+          <AnimateIn direction="left" className="lg:sticky lg:top-28 lg:self-start mb-14 lg:mb-0">
             {/*
               ring-1 ring-black/5: micro-borde premium que separa la imagen
               del fondo blanco sin agregar peso visual (best practice de shadow)
@@ -127,51 +120,43 @@ export default function EspecialidadesPage() {
                 style={{ background: 'linear-gradient(to top, rgba(10,36,99,0.18), transparent)' }}
               />
             </div>
-          </div>
+          </AnimateIn>
 
           {/* ── RIGHT: text + selector ── */}
-          <div ref={rightColRef} className="space-y-0">
+          <AnimateIn direction="right" className="space-y-0">
 
             {/* Eyebrow */}
-            <motion.span
-              {...fadeUp(0)}
-              className="inline-block text-[#1E6BC6] text-xs font-bold uppercase tracking-widest mb-4"
-            >
+            <span className="inline-block text-[#1E6BC6] text-xs font-bold uppercase tracking-widest mb-4">
               ESPECIALIDADES MÉDICAS
-            </motion.span>
+            </span>
 
             {/*
               h1 semántico correcto (a11y guideline: Heading Hierarchy).
               text-wrap: balance para evitar huérfanas.
             */}
-            <motion.h1
-              {...fadeUp(0.06)}
+            <h1
               className="text-2xl md:text-3xl lg:text-[2.15rem] font-black text-[#0A2463] leading-tight mb-4"
               style={{ textWrap: 'balance' } as React.CSSProperties}
             >
               Profesionales especializados en cada área de la salud
-            </motion.h1>
+            </h1>
 
             {/*
               leading-relaxed → 1.625 (UX: Line Height guideline).
               text-[#4B5563] → ratio ~5.9:1 sobre blanco (supera WCAG AA 4.5:1).
               max-w-[52ch] → ~65-75 chars por línea (UX: Line Length guideline).
             */}
-            <motion.p
-              {...fadeUp(0.1)}
+            <p
               className="text-[#4B5563] text-base leading-relaxed max-w-[52ch] mb-6"
               style={{ textWrap: 'pretty' } as React.CSSProperties}
             >
               Contamos con profesionales de experiencia en cada área de la salud.
               Encontrá tu especialidad, conocé los estudios disponibles y sacá
               tu turno directo por WhatsApp, sin llamadas ni esperas.
-            </motion.p>
+            </p>
 
             {/* Stats row — separados con border-l para elegancia */}
-            <motion.div
-              {...fadeUp(0.14)}
-              className="flex gap-0 mb-8 border border-gray-100 rounded-2xl overflow-hidden"
-            >
+            <div className="flex gap-0 mb-8 border border-gray-100 rounded-2xl overflow-hidden">
               {stats.map((s, i) => (
                 <div
                   key={s.value}
@@ -183,21 +168,18 @@ export default function EspecialidadesPage() {
                   </p>
                 </div>
               ))}
-            </motion.div>
+            </div>
 
             {/* Separador */}
-            <motion.div {...fadeUp(0.16)} className="border-b border-gray-100 mb-8" />
+            <div className="border-b border-gray-100 mb-8" />
 
             {/* Label */}
-            <motion.p
-              {...fadeUp(0.18)}
-              className="text-[11px] font-bold text-[#9CA3AF] uppercase tracking-widest mb-3"
-            >
+            <p className="text-[11px] font-bold text-[#9CA3AF] uppercase tracking-widest mb-3">
               SELECCIONÁ TU ESPECIALIDAD
-            </motion.p>
+            </p>
 
             {/* ── Custom dropdown ── */}
-            <motion.div {...fadeUp(0.2)} ref={dropdownRef} className="relative mb-6">
+            <div ref={dropdownRef} className="relative mb-6">
 
               {/* Trigger button */}
               <button
@@ -269,7 +251,7 @@ export default function EspecialidadesPage() {
                   </motion.div>
                 )}
               </AnimatePresence>
-            </motion.div>
+            </div>
 
             {/* ── CTA block — placeholder / selected ── */}
             <AnimatePresence mode="wait">
@@ -347,7 +329,7 @@ export default function EspecialidadesPage() {
                 </motion.div>
               )}
             </AnimatePresence>
-          </div>
+          </AnimateIn>
         </div>
       </div>
     </div>

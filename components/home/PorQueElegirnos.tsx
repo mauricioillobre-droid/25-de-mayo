@@ -1,6 +1,6 @@
 'use client'
-import { useRef } from 'react'
-import { motion, useInView, useReducedMotion } from 'motion/react'
+import { motion, useReducedMotion } from 'motion/react'
+import AnimateIn from '@/components/AnimateIn'
 import { WA_TURNO } from '@/lib/data'
 
 const puntos = [
@@ -44,113 +44,51 @@ const puntos = [
 ]
 
 export default function PorQueElegirnos() {
-  const ref = useRef(null)
-  const isInView = useInView(ref, { once: true, margin: '-60px' })
   const shouldReduce = useReducedMotion()
-
-  const spring = { type: 'spring' as const, stiffness: 65, damping: 18 }
-
-  const container = {
-    hidden: {},
-    show: {
-      transition: {
-        staggerChildren: shouldReduce ? 0 : 0.1,
-        delayChildren: 0.1,
-      },
-    },
-  }
-
-  const item = {
-    hidden: shouldReduce ? {} : { opacity: 0, y: 32 },
-    show: { opacity: 1, y: 0, transition: spring },
-  }
 
   return (
     <section className="relative py-24 md:py-36 bg-[#0A2463] overflow-hidden">
       {/* Background texture */}
-      <div
-        className="absolute inset-0 opacity-[0.04]"
-        style={{
-          backgroundImage: `radial-gradient(circle, #56B4E9 1px, transparent 1px)`,
-          backgroundSize: '40px 40px',
-        }}
-      />
-      {/* Gradient overlays */}
+      <div className="absolute inset-0 opacity-[0.04]" style={{ backgroundImage: 'radial-gradient(circle, #56B4E9 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
       <div className="absolute top-0 right-0 w-96 h-96 bg-[#1E6BC6]/20 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute bottom-0 left-0 w-80 h-80 bg-[#56B4E9]/10 rounded-full blur-3xl pointer-events-none" />
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <motion.div
-          initial={shouldReduce ? {} : { opacity: 0, y: 24 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={spring}
-          className="text-center mb-16"
-        >
+        <AnimateIn direction="up" className="text-center mb-16">
           <span className="inline-block text-[#56B4E9] text-sm font-semibold uppercase tracking-widest mb-4">
             Por qué elegirnos
           </span>
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-black text-white leading-tight">
             Todo lo que necesitás,{' '}
             <br className="hidden md:block" />
-            <span
-              style={{
-                background: 'linear-gradient(135deg, #56B4E9 0%, #93C5FD 100%)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                backgroundClip: 'text',
-              }}
-            >
+            <span style={{ background: 'linear-gradient(135deg, #56B4E9 0%, #93C5FD 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
               en un solo lugar
             </span>
           </h2>
-        </motion.div>
+        </AnimateIn>
 
-        {/* Feature cards */}
-        <motion.div
-          ref={ref}
-          variants={container}
-          initial="hidden"
-          animate={isInView ? 'show' : 'hidden'}
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-14"
-        >
-          {puntos.map((p) => (
-            <motion.div
-              key={p.titulo}
-              variants={item}
-              whileHover={
-                shouldReduce
-                  ? {}
-                  : {
-                      y: -4,
-                      transition: { type: 'spring', stiffness: 300, damping: 20 },
-                    }
-              }
-              className="relative bg-white/8 border border-white/10 rounded-2xl p-7 backdrop-blur-sm hover:bg-white/12 hover:border-[#56B4E9]/30 transition-all duration-300 group overflow-hidden"
-            >
-              {/* Icon */}
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#56B4E9]/30 to-[#1E6BC6]/30 border border-[#56B4E9]/20 flex items-center justify-center text-[#56B4E9] mb-5 group-hover:from-[#56B4E9]/40 group-hover:to-[#1E6BC6]/40 transition-all duration-300">
-                {p.icon}
-              </div>
-
-              {/* Accent line */}
-              <div className="w-8 h-0.5 bg-gradient-to-r from-[#56B4E9] to-transparent mb-4" />
-
-              <h3 className="text-white font-bold text-lg leading-snug mb-3">{p.titulo}</h3>
-              <p className="text-white/60 text-sm leading-relaxed">{p.descripcion}</p>
-            </motion.div>
+        {/* Feature cards — stagger 0.08s */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-14">
+          {puntos.map((p, i) => (
+            <AnimateIn key={p.titulo} direction="up" delay={i * 0.08}>
+              <motion.div
+                whileHover={shouldReduce ? {} : { y: -4, transition: { type: 'spring', stiffness: 300, damping: 20 } }}
+                className="relative bg-white/8 border border-white/10 rounded-2xl p-7 backdrop-blur-sm hover:bg-white/12 hover:border-[#56B4E9]/30 transition-all duration-300 group overflow-hidden h-full"
+              >
+                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#56B4E9]/30 to-[#1E6BC6]/30 border border-[#56B4E9]/20 flex items-center justify-center text-[#56B4E9] mb-5 group-hover:from-[#56B4E9]/40 group-hover:to-[#1E6BC6]/40 transition-all duration-300">
+                  {p.icon}
+                </div>
+                <div className="w-8 h-0.5 bg-gradient-to-r from-[#56B4E9] to-transparent mb-4" />
+                <h3 className="text-white font-bold text-lg leading-snug mb-3">{p.titulo}</h3>
+                <p className="text-white/60 text-sm leading-relaxed">{p.descripcion}</p>
+              </motion.div>
+            </AnimateIn>
           ))}
-        </motion.div>
+        </div>
 
         {/* CTA */}
-        <motion.div
-          initial={shouldReduce ? {} : { opacity: 0, y: 16 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ ...spring, delay: 0.4 }}
-          className="text-center"
-        >
+        <AnimateIn direction="up" delay={0.4} className="text-center">
           <a
             href={WA_TURNO}
             target="_blank"
@@ -162,7 +100,7 @@ export default function PorQueElegirnos() {
             </svg>
             Sacar turno por WhatsApp
           </a>
-        </motion.div>
+        </AnimateIn>
       </div>
     </section>
   )

@@ -1,6 +1,6 @@
 'use client'
 import Image from 'next/image'
-import { motion, useReducedMotion } from 'motion/react'
+import AnimateIn from '@/components/AnimateIn'
 
 interface PageHeroProps {
   eyebrow: string
@@ -10,9 +10,6 @@ interface PageHeroProps {
 }
 
 export default function PageHero({ eyebrow, title, subtitle, backgroundImage }: PageHeroProps) {
-  const shouldReduce = useReducedMotion()
-  const spring = { type: 'spring' as const, stiffness: 70, damping: 18 }
-
   return (
     <section
       className="relative pt-40 pb-20 overflow-hidden"
@@ -21,13 +18,7 @@ export default function PageHero({ eyebrow, title, subtitle, backgroundImage }: 
       {/* Background image (optional) */}
       {backgroundImage && (
         <>
-          <Image
-            src={backgroundImage}
-            alt=""
-            fill
-            className="object-cover"
-            priority
-          />
+          <Image src={backgroundImage} alt="" fill className="object-cover" priority />
           <div className="absolute inset-0 bg-[#0A2463]/65" />
         </>
       )}
@@ -37,21 +28,19 @@ export default function PageHero({ eyebrow, title, subtitle, backgroundImage }: 
       <div className="absolute bottom-0 right-0 w-80 h-80 bg-[#56B4E9]/10 rounded-full blur-3xl translate-x-1/3 translate-y-1/3 pointer-events-none" />
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <motion.div
-          initial={shouldReduce ? {} : { opacity: 0, y: 24 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={spring}
-        >
+        <AnimateIn direction="up">
           <span className="inline-block text-[#56B4E9] text-xs font-bold uppercase tracking-widest mb-4">
             {eyebrow}
           </span>
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-white leading-tight mb-5">
             {title}
           </h1>
+        </AnimateIn>
+        <AnimateIn direction="up" delay={0.15}>
           <p className="text-white/75 text-lg leading-relaxed max-w-xl mx-auto">
             {subtitle}
           </p>
-        </motion.div>
+        </AnimateIn>
       </div>
     </section>
   )

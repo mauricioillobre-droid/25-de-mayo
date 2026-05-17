@@ -1,8 +1,8 @@
 'use client'
 import { useState } from 'react'
-import { motion, useReducedMotion } from 'motion/react'
 import { WA_BASE } from '@/lib/data'
 import PageHero from '@/components/PageHero'
+import AnimateIn from '@/components/AnimateIn'
 
 const MapPinIcon = () => (
   <svg className="w-6 h-6 text-[#1E6BC6] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.8}>
@@ -120,8 +120,6 @@ export default function ContactoPage() {
     mensaje: '',
   })
   const [errors, setErrors] = useState<Partial<Record<keyof FormState, string>>>({})
-  const shouldReduce = useReducedMotion()
-  const spring = { type: 'spring' as const, stiffness: 65, damping: 18 }
 
   const update = (k: keyof FormState) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
     setForm((f) => ({ ...f, [k]: e.target.value }))
@@ -162,12 +160,7 @@ export default function ContactoPage() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
 
           {/* Form card */}
-          <motion.div
-            initial={shouldReduce ? {} : { opacity: 0, x: -28 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ ...spring, delay: 0.08 }}
-            className="bg-white rounded-2xl shadow-[0_8px_40px_rgba(10,36,99,0.08)] border border-gray-100 p-8 md:p-10"
-          >
+          <AnimateIn direction="left" className="bg-white rounded-2xl shadow-[0_8px_40px_rgba(10,36,99,0.08)] border border-gray-100 p-8 md:p-10">
             <h2 className="text-xl font-black text-[#0A2463] mb-8">Envianos un mensaje</h2>
             <div className="space-y-5">
               <div>
@@ -244,15 +237,10 @@ export default function ContactoPage() {
                 </button>
               </div>
             </div>
-          </motion.div>
+          </AnimateIn>
 
           {/* Info + Map */}
-          <motion.div
-            initial={shouldReduce ? {} : { opacity: 0, x: 28 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ ...spring, delay: 0.14 }}
-            className="space-y-6"
-          >
+          <AnimateIn direction="right" delay={0.06} className="space-y-6">
             {/* Contact info card */}
             <div className="bg-white rounded-2xl shadow-[0_8px_40px_rgba(10,36,99,0.08)] border border-gray-100 p-8">
               <h2 className="text-xl font-black text-[#0A2463] mb-7">Información de contacto</h2>
@@ -283,7 +271,7 @@ export default function ContactoPage() {
                 referrerPolicy="no-referrer-when-downgrade"
               />
             </div>
-          </motion.div>
+          </AnimateIn>
         </div>
       </div>
     </div>

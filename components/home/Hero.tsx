@@ -3,6 +3,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { motion, useReducedMotion } from 'motion/react'
 import { WA_TURNO } from '@/lib/data'
+import AnimateIn from '@/components/AnimateIn'
 
 const WhatsAppIcon = () => (
   <svg className="w-5 h-5 shrink-0" fill="currentColor" viewBox="0 0 24 24">
@@ -20,14 +21,6 @@ const trustSignals = [
 export default function Hero() {
   const shouldReduce = useReducedMotion()
 
-  const fadeUp = (delay: number) => ({
-    initial: shouldReduce ? {} : { opacity: 0, y: 24 },
-    animate: { opacity: 1, y: 0 },
-    transition: shouldReduce
-      ? {}
-      : { duration: 0.55, ease: [0.25, 0.1, 0.25, 1] as const, delay },
-  })
-
   return (
     <section className="relative min-h-[85vh] flex items-center overflow-hidden">
       {/* Full-bleed background image */}
@@ -40,13 +33,11 @@ export default function Hero() {
         priority
       />
 
-      {/* Dark overlay #0f2a4a at 50% */}
+      {/* Dark overlay */}
       <div className="absolute inset-0 bg-[#0f2a4a]/50" />
-
-      {/* Subtle bottom gradient for readability */}
       <div className="absolute inset-0 bg-gradient-to-t from-[#0f2a4a]/40 via-transparent to-transparent pointer-events-none" />
 
-      {/* Location badge — anchored bottom-right, clear of the sign */}
+      {/* Location badge — absolute bottom-right */}
       <motion.div
         initial={shouldReduce ? {} : { opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
@@ -59,65 +50,61 @@ export default function Hero() {
         </span>
       </motion.div>
 
-      {/* Content — full width, left aligned */}
+      {/* Content */}
       <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-48 pb-20 md:pt-56 md:pb-24">
         <div className="max-w-2xl xl:max-w-3xl">
 
-          {/* Heading */}
-          <motion.h1
-            {...fadeUp(0.1)}
-            className="text-5xl sm:text-6xl lg:text-7xl font-black text-white leading-[1.05] tracking-tight mb-6"
-          >
-            Tu salud,{' '}
-            <span className="text-[#56B4E9]">cerca de casa</span>
-          </motion.h1>
+          <AnimateIn direction="left">
+            <h1 className="text-5xl sm:text-6xl lg:text-7xl font-black text-white leading-[1.05] tracking-tight mb-6">
+              Tu salud,{' '}
+              <span className="text-[#56B4E9]">cerca de casa</span>
+            </h1>
+          </AnimateIn>
 
-          {/* Subtitle */}
-          <motion.p
-            {...fadeUp(0.2)}
-            className="text-white/80 text-lg md:text-xl leading-relaxed mb-10 max-w-xl"
-          >
-            Más de{' '}
-            <strong className="text-white font-semibold">35 especialidades médicas</strong>{' '}
-            en Los Polvorines. Sacá tu turno fácil y rápido, sin filas.
-          </motion.p>
+          <AnimateIn direction="up" delay={0.1}>
+            <p className="text-white/80 text-lg md:text-xl leading-relaxed mb-10 max-w-xl">
+              Más de{' '}
+              <strong className="text-white font-semibold">35 especialidades médicas</strong>{' '}
+              en Los Polvorines. Sacá tu turno fácil y rápido, sin filas.
+            </p>
+          </AnimateIn>
 
-          {/* CTAs */}
-          <motion.div {...fadeUp(0.3)} className="flex flex-col sm:flex-row gap-3 mb-12">
-            <a
-              href={WA_TURNO}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center justify-center gap-2.5 bg-[#25D366] hover:bg-[#1fba57] active:scale-[0.98] text-white font-bold px-7 py-4 rounded-full shadow-[0_8px_24px_rgba(37,211,102,0.4)] hover:shadow-[0_12px_32px_rgba(37,211,102,0.5)] transition-all duration-200 text-[15px] cursor-pointer"
-            >
-              <WhatsAppIcon />
-              Sacar turno por WhatsApp
-            </a>
-            <Link
-              href="/especialidades"
-              className="inline-flex items-center justify-center gap-2 bg-white/15 backdrop-blur-sm border border-white/30 hover:bg-white/25 text-white font-bold px-7 py-4 rounded-full transition-all duration-200 text-[15px] cursor-pointer"
-            >
-              Ver especialidades
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-              </svg>
-            </Link>
-          </motion.div>
-
-          {/* Trust signals */}
-          <motion.div
-            {...fadeUp(0.4)}
-            className="flex flex-wrap gap-x-6 gap-y-2"
-          >
-            {trustSignals.map((s) => (
-              <span key={s} className="flex items-center gap-1.5 text-white/75 text-sm">
-                <svg className="w-4 h-4 text-[#56B4E9] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+          <AnimateIn direction="up" delay={0.2}>
+            <div className="flex flex-col sm:flex-row gap-3 mb-12">
+              <a
+                href={WA_TURNO}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center gap-2.5 bg-[#25D366] hover:bg-[#1fba57] active:scale-[0.98] text-white font-bold px-7 py-4 rounded-full shadow-[0_8px_24px_rgba(37,211,102,0.4)] hover:shadow-[0_12px_32px_rgba(37,211,102,0.5)] transition-all duration-200 text-[15px] cursor-pointer"
+              >
+                <WhatsAppIcon />
+                Sacar turno por WhatsApp
+              </a>
+              <Link
+                href="/especialidades"
+                className="inline-flex items-center justify-center gap-2 bg-white/15 backdrop-blur-sm border border-white/30 hover:bg-white/25 text-white font-bold px-7 py-4 rounded-full transition-all duration-200 text-[15px] cursor-pointer"
+              >
+                Ver especialidades
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
                 </svg>
-                {s}
-              </span>
-            ))}
-          </motion.div>
+              </Link>
+            </div>
+          </AnimateIn>
+
+          <AnimateIn direction="up" delay={0.3}>
+            <div className="flex flex-wrap gap-x-6 gap-y-2">
+              {trustSignals.map((s) => (
+                <span key={s} className="flex items-center gap-1.5 text-white/75 text-sm">
+                  <svg className="w-4 h-4 text-[#56B4E9] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                  </svg>
+                  {s}
+                </span>
+              ))}
+            </div>
+          </AnimateIn>
+
         </div>
       </div>
     </section>
