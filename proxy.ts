@@ -26,13 +26,20 @@ export async function proxy(request: NextRequest) {
     }
   )
 
-  const {
-    data: { session },
-  } = await supabase.auth.getSession()
-
   const path = request.nextUrl.pathname
   const isLoginRoute = path === '/admin/login'
   const isAdminRoute = path.startsWith('/admin') && !isLoginRoute
+
+  let session = null
+  try {
+    const { data } = await supabase.auth.getSession()
+    session = data.session
+  } catch {
+    if (isAdminRoute) {
+      return NextResponse.redirect(new URL('/admin/login', request.url))
+    }
+    return supabaseResponse
+  }
 
   if (isAdminRoute && !session) {
     return NextResponse.redirect(new URL('/admin/login', request.url))

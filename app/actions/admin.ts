@@ -1,6 +1,6 @@
 'use server'
 
-import { createSupabaseServerClient } from '@/lib/supabase-server'
+import { createSupabaseServerClient, createSupabaseAdminClient } from '@/lib/supabase-server'
 
 export interface TurnoCompleto {
   id: string
@@ -57,7 +57,7 @@ export async function actualizarEstadoTurno(
   turnoId: string,
   estado: TurnoCompleto['estado']
 ) {
-  const supabase = await createSupabaseServerClient()
+  const supabase = createSupabaseAdminClient()
   const { error } = await supabase
     .from('turnos')
     .update({ estado })
@@ -81,22 +81,23 @@ export async function crearProfesional(
   nombre: string,
   especialidadIds: string[]
 ) {
-  const supabase = await createSupabaseServerClient()
+  const supabase = createSupabaseAdminClient()
 
   const { data: profesional, error: errP } = await supabase
     .from('profesionales')
     .insert({ nombre })
     .select('id')
     .single()
-  if (errP || !profesional) throw new Error(errP?.message ?? 'Error')
+  if (errP || !profesional) throw new Error(errP?.message ?? 'Error al crear profesional')
 
   if (especialidadIds.length > 0) {
-    await supabase.from('profesional_especialidades').insert(
+    const { error: errE } = await supabase.from('profesional_especialidades').insert(
       especialidadIds.map((especialidad_id) => ({
         profesional_id: profesional.id,
         especialidad_id,
       }))
     )
+    if (errE) throw new Error(errE.message)
   }
 }
 
@@ -104,7 +105,7 @@ export async function toggleProfesionalActivo(
   profesionalId: string,
   activo: boolean
 ) {
-  const supabase = await createSupabaseServerClient()
+  const supabase = createSupabaseAdminClient()
   const { error } = await supabase
     .from('profesionales')
     .update({ activo })
@@ -127,8 +128,7 @@ export async function guardarDisponibilidad(
   profesionalId: string,
   dias: DisponibilidadDia[]
 ) {
-  const supabase = await createSupabaseServerClient()
-  // Delete existing and replace
+  const supabase = createSupabaseAdminClient()
   await supabase
     .from('disponibilidad_base')
     .delete()
@@ -170,7 +170,7 @@ export async function crearBloqueo(data: {
   hora_fin: string | null
   motivo: string
 }) {
-  const supabase = await createSupabaseServerClient()
+  const supabase = createSupabaseAdminClient()
   const { error } = await supabase.from('bloqueos').insert({
     profesional_id: data.profesional_id || null,
     fecha_inicio: data.fecha_inicio,
@@ -183,7 +183,7 @@ export async function crearBloqueo(data: {
 }
 
 export async function eliminarBloqueo(id: string) {
-  const supabase = await createSupabaseServerClient()
+  const supabase = createSupabaseAdminClient()
   const { error } = await supabase.from('bloqueos').delete().eq('id', id)
   if (error) throw new Error(error.message)
 }
