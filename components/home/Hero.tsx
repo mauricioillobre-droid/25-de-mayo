@@ -46,17 +46,22 @@ export default function Hero() {
       {/* Subtle bottom gradient for readability */}
       <div className="absolute inset-0 bg-gradient-to-t from-[#0f2a4a]/40 via-transparent to-transparent pointer-events-none" />
 
+      {/* Location badge — anchored bottom-right, clear of the sign */}
+      <motion.div
+        initial={shouldReduce ? {} : { opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.55, ease: [0.25, 0.1, 0.25, 1], delay: 0.5 }}
+        className="absolute bottom-8 right-8 z-10"
+      >
+        <span className="inline-flex items-center gap-2 bg-white/15 backdrop-blur-sm border border-white/25 text-white text-[11px] font-semibold px-4 py-2 rounded-full tracking-widest uppercase">
+          <span className="w-1.5 h-1.5 rounded-full bg-[#56B4E9] animate-pulse shrink-0" />
+          Los Polvorines, Malvinas Argentinas
+        </span>
+      </motion.div>
+
       {/* Content — full width, left aligned */}
       <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-20 md:pt-32 md:pb-24">
         <div className="max-w-2xl xl:max-w-3xl">
-
-          {/* Eyebrow */}
-          <motion.div {...fadeUp(0)}>
-            <span className="inline-flex items-center gap-2 bg-white/15 backdrop-blur-sm border border-white/25 text-white text-[11px] font-semibold px-4 py-2 rounded-full mb-8 tracking-widest uppercase">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#56B4E9] animate-pulse shrink-0" />
-              Los Polvorines, Malvinas Argentinas
-            </span>
-          </motion.div>
 
           {/* Heading */}
           <motion.h1

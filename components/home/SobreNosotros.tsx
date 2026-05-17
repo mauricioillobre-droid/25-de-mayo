@@ -48,27 +48,8 @@ export default function SobreNosotros() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-14 lg:gap-24 items-center">
 
-            {/* Image — left on desktop */}
-            <motion.div
-              initial={shouldReduce ? {} : { opacity: 0, x: -48, scale: 0.97 }}
-              animate={isInView ? { opacity: 1, x: 0, scale: 1 } : {}}
-              transition={{ ...spring, delay: 0.12 }}
-              className="relative order-2 lg:order-1"
-            >
-              <div className="absolute -inset-3 bg-gradient-to-br from-[#56B4E9]/12 to-[#1E6BC6]/8 rounded-[28px] blur-sm" />
-              <div className="relative h-72 sm:h-[400px] lg:h-[480px] rounded-2xl overflow-hidden shadow-[0_24px_64px_rgba(10,36,99,0.15)]">
-                <ImageWithFallback
-                  src="/images/recepcion.jpeg"
-                  alt="Interior de 25 de Mayo Consultorios Médicos"
-                  fill
-                  className="object-cover object-center-bottom"
-                  style={{ filter: 'brightness(1.05) contrast(1.08) saturate(1.1)', objectPosition: 'center bottom' }}
-                />
-              </div>
-            </motion.div>
-
-            {/* Text — right on desktop */}
-            <div className="order-1 lg:order-2">
+            {/* Text — left */}
+            <div>
               <motion.div
                 initial={shouldReduce ? {} : { opacity: 0, y: 24 }}
                 animate={isInView ? { opacity: 1, y: 0 } : {}}
@@ -97,6 +78,25 @@ export default function SobreNosotros() {
                 cada paciente.
               </motion.p>
             </div>
+
+            {/* Image — right */}
+            <motion.div
+              initial={shouldReduce ? {} : { opacity: 0, x: 48, scale: 0.97 }}
+              animate={isInView ? { opacity: 1, x: 0, scale: 1 } : {}}
+              transition={{ ...spring, delay: 0.12 }}
+              className="relative"
+            >
+              <div className="absolute -inset-3 bg-gradient-to-br from-[#56B4E9]/12 to-[#1E6BC6]/8 rounded-[28px] blur-sm" />
+              <div className="relative h-72 sm:h-[400px] lg:h-[480px] rounded-2xl overflow-hidden shadow-[0_24px_64px_rgba(10,36,99,0.15)]">
+                <ImageWithFallback
+                  src="/images/recepcion.jpeg"
+                  alt="Interior de 25 de Mayo Consultorios Médicos"
+                  fill
+                  className="object-cover"
+                  style={{ filter: 'brightness(1.05) contrast(1.08) saturate(1.1)', objectPosition: 'center bottom' }}
+                />
+              </div>
+            </motion.div>
           </div>
         </div>
       </section>
