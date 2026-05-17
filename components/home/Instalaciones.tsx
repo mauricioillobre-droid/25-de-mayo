@@ -18,12 +18,34 @@ export default function Instalaciones() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
 
-          {/* Text — left */}
+          {/* Image — left */}
           <motion.div
             initial={shouldReduce ? {} : { opacity: 0, x: -32 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true, margin: '-60px' }}
             transition={spring}
+            className="relative order-2 lg:order-1"
+          >
+            {/* Decorative frame */}
+            <div className="absolute -inset-3 bg-gradient-to-br from-[#1E6BC6]/10 to-[#56B4E9]/8 rounded-[28px] blur-sm pointer-events-none" />
+            <div className="relative h-72 sm:h-[400px] lg:h-[500px] rounded-2xl overflow-hidden shadow-[0_24px_64px_rgba(10,36,99,0.15)]">
+              <Image
+                src="/images/exterior.jpeg"
+                alt="Exterior de 25 de Mayo Consultorios Médicos"
+                fill
+                className="object-cover"
+                style={{ filter: 'brightness(1.05) contrast(1.1) saturate(1.15)' }}
+              />
+            </div>
+          </motion.div>
+
+          {/* Text — right */}
+          <motion.div
+            initial={shouldReduce ? {} : { opacity: 0, x: 32 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true, margin: '-60px' }}
+            transition={{ ...spring, delay: 0.1 }}
+            className="order-1 lg:order-2"
           >
             <span className="inline-block text-[#1E6BC6] text-xs font-bold uppercase tracking-widest mb-4">
               Nuestras instalaciones
@@ -48,27 +70,6 @@ export default function Instalaciones() {
                 </li>
               ))}
             </ul>
-          </motion.div>
-
-          {/* Image — right */}
-          <motion.div
-            initial={shouldReduce ? {} : { opacity: 0, x: 32 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true, margin: '-60px' }}
-            transition={{ ...spring, delay: 0.1 }}
-            className="relative"
-          >
-            {/* Decorative frame */}
-            <div className="absolute -inset-3 bg-gradient-to-br from-[#1E6BC6]/10 to-[#56B4E9]/8 rounded-[28px] blur-sm pointer-events-none" />
-            <div className="relative h-72 sm:h-[400px] lg:h-[500px] rounded-2xl overflow-hidden shadow-[0_24px_64px_rgba(10,36,99,0.15)]">
-              <Image
-                src="/images/recepcion.jpeg"
-                alt="Recepción de 25 de Mayo Consultorios Médicos"
-                fill
-                className="object-cover"
-                style={{ filter: 'brightness(1.05) contrast(1.08) saturate(1.1)' }}
-              />
-            </div>
           </motion.div>
 
         </div>

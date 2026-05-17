@@ -89,10 +89,10 @@ export default function SobreNosotros() {
               <div className="relative h-72 sm:h-[400px] lg:h-[480px] rounded-2xl overflow-hidden shadow-[0_24px_64px_rgba(10,36,99,0.15)]">
                 <ImageWithFallback
                   src="/images/recepcion.jpeg"
-                  alt="Recepción de 25 de Mayo Consultorios Médicos"
+                  alt="Interior de 25 de Mayo Consultorios Médicos"
                   fill
-                  className="object-cover"
-                  style={{ filter: 'brightness(1.05) contrast(1.08) saturate(1.1)' }}
+                  className="object-cover object-center-bottom"
+                  style={{ filter: 'brightness(1.05) contrast(1.08) saturate(1.1)', objectPosition: 'center bottom' }}
                 />
               </div>
             </motion.div>
