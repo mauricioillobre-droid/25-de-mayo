@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import Hero from '@/components/home/Hero'
+import Instalaciones from '@/components/home/Instalaciones'
 import SobreNosotros from '@/components/home/SobreNosotros'
 import EspecialidadesDestacadas from '@/components/home/EspecialidadesDestacadas'
 import PracticasDestacadas from '@/components/home/PracticasDestacadas'
@@ -16,6 +17,7 @@ export default function Home() {
   return (
     <>
       <Hero />
+      <Instalaciones />
       <SobreNosotros />
       <EspecialidadesDestacadas />
       <PracticasDestacadas />
