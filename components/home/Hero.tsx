@@ -35,7 +35,8 @@ export default function Hero() {
         src="/images/exterior.jpeg"
         alt="Exterior del centro médico 25 de Mayo"
         fill
-        className="object-cover object-top"
+        className="object-cover"
+        style={{ objectPosition: 'center 20%' }}
         priority
       />
 
