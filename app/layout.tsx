@@ -1,9 +1,7 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
-import Navbar from '@/components/Navbar'
-import Footer from '@/components/Footer'
-import WhatsAppFloat from '@/components/WhatsAppFloat'
+import LayoutWrapper from '@/components/LayoutWrapper'
 
 const inter = Inter({
   subsets: ['latin'],
@@ -14,17 +12,14 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: '25 de Mayo Consultorios Médicos — Los Polvorines',
   description:
-    'Más de 35 especialidades médicas en Los Polvorines, Malvinas Argentinas. Sacá tu turno por WhatsApp fácil y rápido.',
+    'Más de 35 especialidades médicas en Los Polvorines, Malvinas Argentinas. Sacá tu turno fácil y rápido.',
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="es" className={`${inter.variable} h-full`}>
       <body className="min-h-full flex flex-col antialiased">
-        <Navbar />
-        <main className="flex-1">{children}</main>
-        <Footer />
-        <WhatsAppFloat />
+        <LayoutWrapper>{children}</LayoutWrapper>
       </body>
     </html>
   )
