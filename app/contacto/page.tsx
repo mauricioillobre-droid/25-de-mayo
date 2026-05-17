@@ -2,6 +2,7 @@
 import { useState } from 'react'
 import { motion, useReducedMotion } from 'motion/react'
 import { WA_BASE } from '@/lib/data'
+import PageHero from '@/components/PageHero'
 
 const MapPinIcon = () => (
   <svg className="w-6 h-6 text-[#1E6BC6] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.8}>
@@ -150,26 +151,12 @@ export default function ContactoPage() {
 
   return (
     <div className="min-h-screen bg-[#F8FBFF]">
-      {/* Page header */}
-      <div className="bg-white border-b border-gray-100 pt-20 md:pt-24">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16">
-          <motion.div
-            initial={shouldReduce ? {} : { opacity: 0, y: 24 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={spring}
-          >
-            <span className="inline-block text-[#1E6BC6] text-xs font-bold uppercase tracking-widest mb-4">
-              Estamos para ayudarte
-            </span>
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-[#0A2463] mb-4 leading-tight">
-              Contactanos
-            </h1>
-            <p className="text-[#6B7280] text-lg leading-relaxed max-w-xl">
-              Respondemos por WhatsApp o email. También podés venir a visitarnos.
-            </p>
-          </motion.div>
-        </div>
-      </div>
+      <PageHero
+        eyebrow="ESTAMOS PARA AYUDARTE"
+        title="Contactanos"
+        subtitle="Respondemos por WhatsApp o email. También podés venir a visitarnos."
+        backgroundImage="/images/recepcion.jpeg"
+      />
 
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">

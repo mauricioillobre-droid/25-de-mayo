@@ -1,6 +1,7 @@
 'use client'
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import { motion, AnimatePresence, useReducedMotion } from 'motion/react'
 import { WA_TURNO } from '@/lib/data'
 
@@ -21,9 +22,14 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
   const shouldReduce = useReducedMotion()
+  const pathname = usePathname()
+
+  // Transparent effect only on the home page
+  const isHome = pathname === '/'
+  const isTransparent = isHome && !scrolled
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 24)
+    const onScroll = () => setScrolled(window.scrollY > 20)
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
@@ -31,25 +37,25 @@ export default function Navbar() {
   return (
     <motion.header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        scrolled
-          ? 'bg-white/98 backdrop-blur-md shadow-[0_1px_20px_rgba(0,0,0,0.08)]'
-          : 'bg-transparent'
+        isTransparent
+          ? 'bg-transparent'
+          : 'bg-white/98 backdrop-blur-md shadow-[0_1px_20px_rgba(0,0,0,0.08)]'
       }`}
       initial={shouldReduce ? false : { y: -80, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ type: 'spring', stiffness: 80, damping: 20 }}
     >
-      {/* Top accent line — only visible when scrolled */}
-      <div className={`h-0.5 bg-gradient-to-r from-[#0A2463] via-[#1E6BC6] to-[#56B4E9] transition-opacity duration-300 ${scrolled ? 'opacity-100' : 'opacity-0'}`} />
+      {/* Top accent line — hidden when transparent over hero */}
+      <div className={`h-0.5 bg-gradient-to-r from-[#0A2463] via-[#1E6BC6] to-[#56B4E9] transition-opacity duration-300 ${isTransparent ? 'opacity-0' : 'opacity-100'}`} />
 
       <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 md:h-20">
           {/* Logo */}
           <Link href="/" className="flex flex-col leading-none gap-0.5 hover:opacity-80 transition-opacity">
-            <span className={`font-black text-base md:text-lg tracking-tight transition-colors duration-300 ${scrolled ? 'text-[#0A2463]' : 'text-white'}`}>
+            <span className={`font-black text-base md:text-lg tracking-tight transition-colors duration-300 ${isTransparent ? 'text-white' : 'text-[#0A2463]'}`}>
               25 DE MAYO
             </span>
-            <span className={`font-semibold text-[11px] md:text-xs tracking-wide transition-colors duration-300 ${scrolled ? 'text-[#1E6BC6]' : 'text-white/85'}`}>
+            <span className={`font-semibold text-[11px] md:text-xs tracking-wide transition-colors duration-300 ${isTransparent ? 'text-white/85' : 'text-[#1E6BC6]'}`}>
               Consultorios Médicos
             </span>
           </Link>
@@ -61,15 +67,15 @@ export default function Navbar() {
                 key={href}
                 href={href}
                 className={`font-medium text-sm px-3 py-2 rounded-lg transition-all duration-200 ${
-                  scrolled
-                    ? 'text-[#0A2463]/80 hover:text-[#1E6BC6] hover:bg-[#F0F7FF]'
-                    : 'text-white/90 hover:text-white hover:bg-white/15'
+                  isTransparent
+                    ? 'text-white/90 hover:text-white hover:bg-white/15'
+                    : 'text-[#0A2463]/80 hover:text-[#1E6BC6] hover:bg-[#F0F7FF]'
                 }`}
               >
                 {label}
               </Link>
             ))}
-            <div className={`w-px h-5 mx-2 transition-colors duration-300 ${scrolled ? 'bg-gray-200' : 'bg-white/30'}`} />
+            <div className={`w-px h-5 mx-2 transition-colors duration-300 ${isTransparent ? 'bg-white/30' : 'bg-gray-200'}`} />
             <a
               href={WA_TURNO}
               target="_blank"
@@ -85,7 +91,7 @@ export default function Navbar() {
           <button
             onClick={() => setMenuOpen(!menuOpen)}
             className={`md:hidden p-2 rounded-lg transition-colors cursor-pointer min-w-[44px] min-h-[44px] flex items-center justify-center ${
-              scrolled ? 'text-[#0A2463] hover:bg-[#F4F6F9]' : 'text-white hover:bg-white/15'
+              isTransparent ? 'text-white hover:bg-white/15' : 'text-[#0A2463] hover:bg-[#F4F6F9]'
             }`}
             aria-label={menuOpen ? 'Cerrar menú' : 'Abrir menú'}
           >
