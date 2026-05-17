@@ -30,8 +30,8 @@ export default function Instalaciones() {
             <div className="absolute -inset-3 bg-gradient-to-br from-[#1E6BC6]/10 to-[#56B4E9]/8 rounded-[28px] blur-sm pointer-events-none" />
             <div className="relative h-72 sm:h-[400px] lg:h-[500px] rounded-2xl overflow-hidden shadow-[0_24px_64px_rgba(10,36,99,0.15)]">
               <Image
-                src="/images/exterior.jpeg"
-                alt="Exterior de 25 de Mayo Consultorios Médicos"
+                src="/images/recepcion.jpeg"
+                alt="Recepción de 25 de Mayo Consultorios Médicos"
                 fill
                 className="object-cover"
                 style={{ filter: 'brightness(1.05) contrast(1.1) saturate(1.15)' }}

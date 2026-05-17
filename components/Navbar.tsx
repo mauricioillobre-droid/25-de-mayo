@@ -32,24 +32,24 @@ export default function Navbar() {
     <motion.header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         scrolled
-          ? 'bg-white/98 backdrop-blur-md shadow-[0_1px_24px_rgba(10,36,99,0.10)]'
-          : 'bg-white/95 backdrop-blur-sm'
+          ? 'bg-white/98 backdrop-blur-md shadow-[0_1px_20px_rgba(0,0,0,0.08)]'
+          : 'bg-transparent'
       }`}
       initial={shouldReduce ? false : { y: -80, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ type: 'spring', stiffness: 80, damping: 20 }}
     >
-      {/* Top accent line */}
-      <div className="h-0.5 bg-gradient-to-r from-[#0A2463] via-[#1E6BC6] to-[#56B4E9]" />
+      {/* Top accent line — only visible when scrolled */}
+      <div className={`h-0.5 bg-gradient-to-r from-[#0A2463] via-[#1E6BC6] to-[#56B4E9] transition-opacity duration-300 ${scrolled ? 'opacity-100' : 'opacity-0'}`} />
 
       <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 md:h-20">
           {/* Logo */}
           <Link href="/" className="flex flex-col leading-none gap-0.5 hover:opacity-80 transition-opacity">
-            <span className="text-[#0A2463] font-black text-base md:text-lg tracking-tight">
+            <span className={`font-black text-base md:text-lg tracking-tight transition-colors duration-300 ${scrolled ? 'text-[#0A2463]' : 'text-white'}`}>
               25 DE MAYO
             </span>
-            <span className="text-[#1E6BC6] font-semibold text-[11px] md:text-xs tracking-wide">
+            <span className={`font-semibold text-[11px] md:text-xs tracking-wide transition-colors duration-300 ${scrolled ? 'text-[#1E6BC6]' : 'text-white/85'}`}>
               Consultorios Médicos
             </span>
           </Link>
@@ -60,12 +60,16 @@ export default function Navbar() {
               <Link
                 key={href}
                 href={href}
-                className="text-[#0A2463]/80 font-medium text-sm px-3 py-2 rounded-lg hover:text-[#1E6BC6] hover:bg-[#F0F7FF] transition-all duration-200"
+                className={`font-medium text-sm px-3 py-2 rounded-lg transition-all duration-200 ${
+                  scrolled
+                    ? 'text-[#0A2463]/80 hover:text-[#1E6BC6] hover:bg-[#F0F7FF]'
+                    : 'text-white/90 hover:text-white hover:bg-white/15'
+                }`}
               >
                 {label}
               </Link>
             ))}
-            <div className="w-px h-5 bg-gray-200 mx-2" />
+            <div className={`w-px h-5 mx-2 transition-colors duration-300 ${scrolled ? 'bg-gray-200' : 'bg-white/30'}`} />
             <a
               href={WA_TURNO}
               target="_blank"
@@ -80,7 +84,9 @@ export default function Navbar() {
           {/* Mobile hamburger */}
           <button
             onClick={() => setMenuOpen(!menuOpen)}
-            className="md:hidden p-2 text-[#0A2463] rounded-lg hover:bg-[#F4F6F9] transition-colors cursor-pointer min-w-[44px] min-h-[44px] flex items-center justify-center"
+            className={`md:hidden p-2 rounded-lg transition-colors cursor-pointer min-w-[44px] min-h-[44px] flex items-center justify-center ${
+              scrolled ? 'text-[#0A2463] hover:bg-[#F4F6F9]' : 'text-white hover:bg-white/15'
+            }`}
             aria-label={menuOpen ? 'Cerrar menú' : 'Abrir menú'}
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
@@ -101,15 +107,15 @@ export default function Navbar() {
               animate={{ height: 'auto', opacity: 1 }}
               exit={shouldReduce ? {} : { height: 0, opacity: 0 }}
               transition={{ duration: 0.22, ease: 'easeInOut' }}
-              className="overflow-hidden md:hidden border-t border-gray-100"
+              className="overflow-hidden md:hidden border-t border-white/20 bg-[#0A2463]/95 backdrop-blur-md rounded-b-2xl"
             >
-              <div className="py-4 flex flex-col gap-1">
+              <div className="py-4 flex flex-col gap-1 px-1">
                 {navLinks.map(({ href, label }) => (
                   <Link
                     key={href}
                     href={href}
                     onClick={() => setMenuOpen(false)}
-                    className="text-[#0A2463] font-medium text-base px-3 py-3 rounded-xl hover:bg-[#F0F7FF] hover:text-[#1E6BC6] transition-all duration-200 min-h-[44px] flex items-center"
+                    className="text-white/90 font-medium text-base px-3 py-3 rounded-xl hover:bg-white/10 hover:text-white transition-all duration-200 min-h-[44px] flex items-center"
                   >
                     {label}
                   </Link>

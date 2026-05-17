@@ -60,7 +60,7 @@ export default function Hero() {
       </motion.div>
 
       {/* Content — full width, left aligned */}
-      <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-20 md:pt-32 md:pb-24">
+      <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-48 pb-20 md:pt-56 md:pb-24">
         <div className="max-w-2xl xl:max-w-3xl">
 
           {/* Heading */}
