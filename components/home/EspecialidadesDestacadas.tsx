@@ -71,7 +71,7 @@ export default function EspecialidadesDestacadas() {
                     rel="noopener noreferrer"
                     aria-label={`Sacar turno con ${esp.name}`}
                     onClick={(e) => e.stopPropagation()}
-                    className="flex items-center gap-1 text-[#0A2463] text-sm font-semibold hover:text-[#1E6BC6] transition-colors duration-150 cursor-pointer w-fit"
+                    className="flex items-center gap-1 text-[#0A2463] text-sm font-semibold hover:text-[#1E6BC6] transition-colors duration-150 cursor-pointer w-fit min-h-[44px]"
                   >
                     Ver turnos
                     <svg className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform duration-150" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>

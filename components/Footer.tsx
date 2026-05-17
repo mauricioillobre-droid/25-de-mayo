@@ -39,21 +39,21 @@ export default function Footer() {
   return (
     <footer className="bg-[#0A2463] text-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-10">
           {/* Brand */}
           <div>
             <div className="mb-4">
               <p className="text-white font-extrabold text-xl tracking-tight">25 DE MAYO</p>
               <p className="text-[#56B4E9] font-medium text-sm">Consultorios Médicos</p>
             </div>
-            <p className="text-white/70 text-sm leading-relaxed">
+            <p className="text-white/90 text-sm leading-relaxed">
               Más de 35 especialidades médicas en Los Polvorines. Cuidamos tu salud cerca de tu casa.
             </p>
             <a
               href="https://www.instagram.com/25demayo.cm/"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 mt-4 text-white/70 hover:text-[#56B4E9] transition-colors"
+              className="inline-flex items-center gap-2 mt-4 text-white/90 hover:text-[#56B4E9] transition-colors"
             >
               <InstagramIcon />
               <span className="text-sm">@25demayo.cm</span>
@@ -68,7 +68,7 @@ export default function Footer() {
                 <li key={href}>
                   <Link
                     href={href}
-                    className="text-white/70 hover:text-[#56B4E9] text-sm transition-colors"
+                    className="text-white/90 hover:text-[#56B4E9] text-sm transition-colors"
                   >
                     {label}
                   </Link>
@@ -81,23 +81,23 @@ export default function Footer() {
           <div>
             <h3 className="text-white font-semibold mb-4">Contacto</h3>
             <ul className="space-y-3">
-              <li className="flex items-start gap-2 text-white/70 text-sm">
+              <li className="flex items-start gap-2 text-white/90 text-sm">
                 <MapPinIcon />
                 <span>25 de Mayo 2557, entre Savio y Suiza, Los Polvorines, Malvinas Argentinas</span>
               </li>
               <li className="flex items-center gap-2 text-sm">
                 <PhoneIcon />
-                <a href="tel:+5491122355689" className="text-white/70 hover:text-[#56B4E9] transition-colors">
+                <a href="tel:+5491122355689" className="text-white/90 hover:text-[#56B4E9] transition-colors">
                   +54 9 11 2235-5689
                 </a>
               </li>
               <li className="flex items-center gap-2 text-sm">
                 <MailIcon />
-                <a href="mailto:25demayocm@gmail.com" className="text-white/70 hover:text-[#56B4E9] transition-colors">
+                <a href="mailto:25demayocm@gmail.com" className="text-white/90 hover:text-[#56B4E9] transition-colors">
                   25demayocm@gmail.com
                 </a>
               </li>
-              <li className="flex items-start gap-2 text-white/70 text-sm">
+              <li className="flex items-start gap-2 text-white/90 text-sm">
                 <ClockIcon />
                 <div>
                   <p>Lun–Vie: 8:00 a 18:00 hs</p>
@@ -108,7 +108,7 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="border-t border-white/10 mt-10 pt-6 text-center text-white/50 text-xs">
+        <div className="border-t border-white/10 mt-10 pt-6 text-center text-white/75 text-xs">
           © 2026 25 de Mayo Consultorios Médicos. Todos los derechos reservados.
           {' · '}
           <a href="#" className="hover:text-[#56B4E9] transition-colors">

@@ -56,7 +56,7 @@ export default function PorQueElegirnos() {
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <AnimateIn direction="up" className="text-center mb-16">
-          <span className="inline-block text-[#56B4E9] text-sm font-semibold uppercase tracking-widest mb-4">
+          <span className="inline-block text-[#56B4E9] text-xs font-bold uppercase tracking-widest mb-4">
             Por qué elegirnos
           </span>
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-black text-white leading-tight">
@@ -81,7 +81,7 @@ export default function PorQueElegirnos() {
                 </div>
                 <div className="w-8 h-0.5 bg-gradient-to-r from-[#56B4E9] to-transparent mb-4" />
                 <h3 className="text-white font-bold text-lg leading-snug mb-3">{p.titulo}</h3>
-                <p className="text-white/60 text-sm leading-relaxed">{p.descripcion}</p>
+                <p className="text-white/85 text-sm leading-relaxed">{p.descripcion}</p>
               </motion.div>
             </AnimateIn>
           ))}

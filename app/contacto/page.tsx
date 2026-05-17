@@ -44,7 +44,17 @@ const motivos = [
   'Otro',
 ]
 
-const labelCls = 'block text-[10px] font-bold text-[#6B7280] uppercase tracking-widest mb-2'
+const labelCls = 'block text-xs font-bold text-[#6B7280] uppercase tracking-widest mb-2'
+
+const ErrorMsg = ({ msg }: { msg?: string }) =>
+  msg ? (
+    <p className="flex items-center gap-1.5 text-red-500 text-xs mt-1.5" role="alert">
+      <svg className="w-3.5 h-3.5 shrink-0" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+        <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+      </svg>
+      {msg}
+    </p>
+  ) : null
 const inputCls =
   'w-full px-4 py-3.5 border border-gray-200 rounded-xl bg-white text-[#0A2463] placeholder:text-[#9CA3AF] focus:outline-none focus:border-[#56B4E9] focus:ring-2 focus:ring-[#56B4E9]/20 transition-all duration-200 text-sm'
 
@@ -127,6 +137,7 @@ export default function ContactoPage() {
   const validate = () => {
     const errs: typeof errors = {}
     if (!form.nombre.trim()) errs.nombre = 'El nombre es obligatorio.'
+    if (form.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) errs.email = 'El email no es válido.'
     if (!form.mensaje.trim()) errs.mensaje = 'El mensaje es obligatorio.'
     setErrors(errs)
     return Object.keys(errs).length === 0
@@ -172,7 +183,7 @@ export default function ContactoPage() {
                   onChange={update('nombre')}
                   className={inputCls}
                 />
-                {errors.nombre && <p className="text-red-500 text-xs mt-1.5">{errors.nombre}</p>}
+                <ErrorMsg msg={errors.nombre} />
               </div>
 
               <div>
@@ -195,6 +206,7 @@ export default function ContactoPage() {
                   onChange={update('email')}
                   className={inputCls}
                 />
+                <ErrorMsg msg={errors.email} />
               </div>
 
               <div>
@@ -215,7 +227,7 @@ export default function ContactoPage() {
                   onChange={update('mensaje')}
                   className={`${inputCls} resize-none`}
                 />
-                {errors.mensaje && <p className="text-red-500 text-xs mt-1.5">{errors.mensaje}</p>}
+                <ErrorMsg msg={errors.mensaje} />
               </div>
 
               <div className="flex flex-wrap gap-3 pt-2">
@@ -251,7 +263,7 @@ export default function ContactoPage() {
                       {item.icon}
                     </div>
                     <div className="pt-0.5">
-                      <p className="text-[10px] font-bold text-[#6B7280] uppercase tracking-widest mb-1">{item.label}</p>
+                      <p className="text-xs font-bold text-[#6B7280] uppercase tracking-widest mb-1">{item.label}</p>
                       {item.content}
                     </div>
                   </li>
@@ -260,7 +272,7 @@ export default function ContactoPage() {
             </div>
 
             {/* Map */}
-            <div className="rounded-2xl overflow-hidden shadow-[0_8px_32px_rgba(10,36,99,0.10)] border border-gray-100 h-56 md:h-64">
+            <div className="rounded-2xl overflow-hidden shadow-[0_8px_32px_rgba(10,36,99,0.10)] border border-gray-100 h-56 md:h-80 lg:h-96">
               <iframe
                 title="Mapa 25 de Mayo Consultorios Médicos"
                 src="https://maps.google.com/maps?q=25+de+Mayo+2557+Los+Polvorines+Buenos+Aires+Argentina&output=embed&z=16"

@@ -24,7 +24,7 @@ export default function Instalaciones() {
                 alt="Recepción de 25 de Mayo Consultorios Médicos"
                 fill
                 className="object-cover"
-                style={{ filter: 'brightness(1.05) contrast(1.1) saturate(1.15)' }}
+                style={{ filter: 'brightness(1.02) contrast(1.02) saturate(1.05)' }}
               />
             </div>
           </AnimateIn>

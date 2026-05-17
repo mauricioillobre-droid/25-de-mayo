@@ -34,6 +34,13 @@ export default function Navbar() {
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
+  // Close mobile menu on Escape key (WCAG 2.1.2)
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setMenuOpen(false) }
+    document.addEventListener('keydown', onKey)
+    return () => document.removeEventListener('keydown', onKey)
+  }, [])
+
   return (
     <motion.header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
@@ -51,7 +58,7 @@ export default function Navbar() {
       <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 md:h-20">
           {/* Logo */}
-          <Link href="/" className="flex flex-col leading-none gap-0.5 hover:opacity-80 transition-opacity">
+          <Link href="/" aria-label="25 de Mayo Consultorios Médicos — Ir a inicio" className="flex flex-col leading-none gap-0.5 hover:opacity-80 transition-opacity">
             <span className={`font-black text-base md:text-lg tracking-tight transition-colors duration-300 ${isTransparent ? 'text-white' : 'text-[#0A2463]'}`}>
               25 DE MAYO
             </span>
@@ -66,10 +73,10 @@ export default function Navbar() {
               <Link
                 key={href}
                 href={href}
-                className={`font-medium text-sm px-3 py-2 rounded-lg transition-all duration-200 ${
+                className={`font-medium text-sm px-3 py-2 rounded-lg transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:rounded-lg ${
                   isTransparent
-                    ? 'text-white/90 hover:text-white hover:bg-white/15'
-                    : 'text-[#0A2463]/80 hover:text-[#1E6BC6] hover:bg-[#F0F7FF]'
+                    ? 'text-white/90 hover:text-white hover:bg-white/15 focus-visible:ring-white/60'
+                    : 'text-[#0A2463]/80 hover:text-[#1E6BC6] hover:bg-[#F0F7FF] focus-visible:ring-[#1E6BC6]/50'
                 }`}
               >
                 {label}
