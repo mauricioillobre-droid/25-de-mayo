@@ -63,9 +63,8 @@ export default function Hero() {
 
           <AnimateIn direction="up" delay={0.1}>
             <p className="text-white/80 text-lg md:text-xl leading-relaxed mb-10 max-w-xl">
-              Más de{' '}
-              <strong className="text-white font-semibold">35 especialidades médicas</strong>{' '}
-              en Los Polvorines. Sacá tu turno fácil y rápido, sin filas.
+              Más de 35 especialidades médicas a minutos de tu casa.
+              Atención de calidad, profesionales comprometidos y turnos sin esperas.
             </p>
           </AnimateIn>
 

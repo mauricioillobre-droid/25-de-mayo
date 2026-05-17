@@ -53,7 +53,7 @@ export default function PracticasDestacadas() {
             Prácticas y estudios
           </h2>
           <p className="text-[#6B7280] text-base md:text-lg max-w-lg mx-auto leading-relaxed">
-            Realizamos estudios y procedimientos sin que tengas que ir a otro lado.
+            Estudios y procedimientos realizados en el propio centro, con equipamiento actualizado y profesionales especializados.
           </p>
         </AnimateIn>
 

@@ -64,9 +64,8 @@ export default function PracticasCatalog() {
               className="text-[#4B5563] text-base leading-relaxed max-w-[52ch] mb-7"
               style={{ textWrap: 'pretty' } as React.CSSProperties}
             >
-              Realizamos una amplia variedad de estudios y procedimientos directamente
-              en el centro. Sin derivaciones innecesarias, con profesionales especializados
-              y turnos coordinados por WhatsApp.
+              Realizamos estudios y procedimientos en el propio centro, sin derivaciones
+              innecesarias. Equipamiento actualizado y profesionales especializados en cada práctica.
             </p>
 
             {/* WA CTA */}

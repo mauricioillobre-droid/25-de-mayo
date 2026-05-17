@@ -59,11 +59,10 @@ export default function SobreNosotros() {
                   <span className="text-[#1E6BC6]">atención de calidad</span>
                 </h2>
                 <p className="text-[#6B7280] text-base md:text-lg leading-relaxed">
-                  25 de Mayo Consultorios Médicos nació en diciembre de 2020 con un objetivo claro: acercar
-                  la salud a los vecinos de Los Polvorines y la zona norte del conurbano bonaerense. En pocos
-                  años crecimos hasta ofrecer más de 35 especialidades médicas y una amplia variedad de
-                  prácticas y estudios, siempre priorizando la calidez en la atención y la accesibilidad para
-                  cada paciente.
+                  Nacimos en diciembre de 2020 con un objetivo claro: acercar la salud de calidad a los
+                  vecinos de Los Polvorines y el norte del conurbano. Hoy ofrecemos más de 35 especialidades
+                  y una amplia variedad de estudios, con el mismo compromiso de siempre: atención cálida,
+                  profesional y cerca de tu casa.
                 </p>
               </div>
             </AnimateIn>

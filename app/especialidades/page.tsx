@@ -150,9 +150,8 @@ export default function EspecialidadesPage() {
               className="text-[#4B5563] text-base leading-relaxed max-w-[52ch] mb-6"
               style={{ textWrap: 'pretty' } as React.CSSProperties}
             >
-              Contamos con profesionales de experiencia en cada área de la salud.
-              Encontrá tu especialidad, conocé los estudios disponibles y sacá
-              tu turno directo por WhatsApp, sin llamadas ni esperas.
+              Profesionales con experiencia y formación en cada área de la medicina.
+              Encontrá la especialidad que necesitás y coordiná tu consulta de forma simple.
             </p>
 
             {/* Stats row — separados con border-l para elegancia */}

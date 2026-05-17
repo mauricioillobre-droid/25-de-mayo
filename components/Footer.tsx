@@ -47,7 +47,7 @@ export default function Footer() {
               <p className="text-[#56B4E9] font-medium text-sm">Consultorios Médicos</p>
             </div>
             <p className="text-white/90 text-sm leading-relaxed">
-              Más de 35 especialidades médicas en Los Polvorines. Cuidamos tu salud cerca de tu casa.
+              Centro médico en Los Polvorines con más de 35 especialidades. Atención de calidad, cerca de tu casa.
             </p>
             <a
               href="https://www.instagram.com/25demayo.cm/"

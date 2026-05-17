@@ -40,7 +40,7 @@ export default function Instalaciones() {
               para vos
             </h2>
             <p className="text-[#6B7280] text-lg leading-relaxed mb-8 max-w-lg">
-              Nuestro centro médico fue diseñado para que te sientas cómodo y bien atendido desde el primer momento. Espacios amplios, modernos y accesibles para toda la familia.
+              Diseñamos cada espacio pensando en tu comodidad y la de tu familia. Ambientes amplios, modernos y accesibles para que te sientas bien atendido desde el primer momento.
             </p>
             <ul className="space-y-3.5">
               {features.map((item) => (
