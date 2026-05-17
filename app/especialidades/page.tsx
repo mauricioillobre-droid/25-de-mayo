@@ -1,7 +1,7 @@
 'use client'
 import { useState } from 'react'
+import Image from 'next/image'
 import { motion, AnimatePresence, useReducedMotion } from 'motion/react'
-import PageHero from '@/components/PageHero'
 import { especialidades, practicas } from '@/lib/data'
 
 const WA_BASE = 'https://wa.me/5491122355689'
@@ -33,7 +33,7 @@ const ChevronIcon = ({ open }: { open: boolean }) => (
   <motion.svg
     animate={{ rotate: open ? 180 : 0 }}
     transition={{ duration: 0.22, ease: 'easeInOut' }}
-    className="w-5 h-5 shrink-0 text-[#1E6BC6]"
+    className={`w-5 h-5 shrink-0 transition-colors duration-200 ${open ? 'text-[#1E6BC6]' : 'text-gray-400'}`}
     fill="none"
     stroke="currentColor"
     viewBox="0 0 24 24"
@@ -43,6 +43,12 @@ const ChevronIcon = ({ open }: { open: boolean }) => (
   </motion.svg>
 )
 
+const stats = [
+  { value: '35+', label: 'especialidades' },
+  { value: '2020', label: 'año de fundación' },
+  { value: '24hs', label: 'turnos por WhatsApp' },
+]
+
 export default function EspecialidadesPage() {
   const [openIdx, setOpenIdx] = useState<number | null>(null)
   const shouldReduce = useReducedMotion()
@@ -50,99 +56,138 @@ export default function EspecialidadesPage() {
   const toggle = (i: number) => setOpenIdx((prev) => (prev === i ? null : i))
 
   return (
-    <div className="min-h-screen bg-[#F8FBFF]">
-      <PageHero
-        eyebrow="MÁS DE 35 ESPECIALIDADES"
-        title="Atención especializada cerca de vos"
-        subtitle="Cada especialidad con profesionales de experiencia, turnos por WhatsApp y sin esperas innecesarias."
-        backgroundImage="/images/consultorio.jpeg"
-      />
+    <div className="min-h-screen bg-white">
+      <div className="max-w-7xl mx-auto px-6 py-20">
+        <div className="lg:grid lg:grid-cols-2 lg:gap-16 items-start">
 
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
-        <div className="bg-white rounded-2xl shadow-[0_4px_32px_rgba(10,36,99,0.08)] border border-gray-100 overflow-hidden divide-y divide-gray-100">
-          {especialidades.map((esp, i) => {
-            const items = getPracticasForEsp(esp.name)
-            const isOpen = openIdx === i
+          {/* ── LEFT: sticky panel ── */}
+          <div className="lg:sticky lg:top-[100px] lg:self-start mb-12 lg:mb-0">
 
-            return (
-              <div key={esp.name}>
-                {/* Accordion header */}
-                <button
-                  onClick={() => toggle(i)}
-                  className="w-full flex items-center justify-between gap-4 px-6 py-4 text-left hover:bg-[#F8FBFF] transition-colors duration-150 cursor-pointer group"
-                  aria-expanded={isOpen}
-                >
-                  <div className="flex items-center gap-3 min-w-0">
-                    <span
-                      className={`w-2 h-2 rounded-full shrink-0 transition-colors duration-200 ${
-                        isOpen ? 'bg-[#1E6BC6]' : 'bg-gray-300 group-hover:bg-[#56B4E9]'
-                      }`}
-                    />
-                    <span
-                      className={`font-semibold text-[15px] leading-snug transition-colors duration-200 ${
-                        isOpen ? 'text-[#0A2463]' : 'text-[#374151] group-hover:text-[#0A2463]'
-                      }`}
-                    >
-                      {esp.name}
-                    </span>
-                    {items.length > 0 && (
-                      <span className="hidden sm:inline-flex text-[10px] font-semibold text-[#1E6BC6] bg-[#EFF6FF] px-2 py-0.5 rounded-full shrink-0">
-                        {items.length} práctica{items.length !== 1 ? 's' : ''}
-                      </span>
-                    )}
+            {/* Image */}
+            <div className="relative h-64 lg:h-[520px] rounded-xl lg:rounded-2xl overflow-hidden shadow-2xl">
+              <Image
+                src="/images/consultorio.jpeg"
+                alt="Consultorio médico 25 de Mayo"
+                fill
+                className="object-cover"
+                priority
+              />
+            </div>
+
+            {/* Text block */}
+            <div className="mt-8 space-y-4">
+              <span className="inline-block text-[#1E6BC6] text-xs font-bold uppercase tracking-widest">
+                ESPECIALIDADES MÉDICAS
+              </span>
+              <h1
+                className="text-2xl md:text-3xl lg:text-4xl font-black text-[#0A2463] leading-tight"
+                style={{ textWrap: 'pretty' } as React.CSSProperties}
+              >
+                Más de 35 especialidades en un solo lugar
+              </h1>
+              <p
+                className="text-[#6B7280] text-base leading-relaxed max-w-sm"
+                style={{ textWrap: 'balance' } as React.CSSProperties}
+              >
+                Contamos con profesionales especializados en cada área de la salud.
+                Seleccioná la especialidad para ver las prácticas disponibles
+                y sacar tu turno directo por WhatsApp.
+              </p>
+
+              {/* Stats */}
+              <div className="flex gap-6 pt-2">
+                {stats.map((s) => (
+                  <div key={s.label}>
+                    <p className="text-2xl font-black text-[#1E6BC6] leading-none">{s.value}</p>
+                    <p className="text-[11px] text-[#6B7280] font-medium mt-1 leading-tight">{s.label}</p>
                   </div>
-                  <ChevronIcon open={isOpen} />
-                </button>
-
-                {/* Accordion body */}
-                <AnimatePresence initial={false}>
-                  {isOpen && (
-                    <motion.div
-                      key="body"
-                      initial={shouldReduce ? {} : { height: 0, opacity: 0 }}
-                      animate={{ height: 'auto', opacity: 1 }}
-                      exit={shouldReduce ? {} : { height: 0, opacity: 0 }}
-                      transition={{ duration: 0.25, ease: [0.4, 0, 0.2, 1] }}
-                      className="overflow-hidden"
-                    >
-                      <div className="px-6 pb-5 pt-1">
-                        {/* Practice list */}
-                        {items.length > 0 && (
-                          <ul className="mb-4 space-y-2">
-                            {items.map((item) => (
-                              <li key={item} className="flex items-start gap-2.5 text-sm text-[#6B7280]">
-                                <svg
-                                  className="w-4 h-4 text-[#56B4E9] shrink-0 mt-0.5"
-                                  fill="none"
-                                  stroke="currentColor"
-                                  viewBox="0 0 24 24"
-                                  strokeWidth={2.5}
-                                >
-                                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                                </svg>
-                                {item}
-                              </li>
-                            ))}
-                          </ul>
-                        )}
-
-                        {/* WhatsApp CTA */}
-                        <a
-                          href={waEsp(esp.name)}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center gap-2 bg-[#25D366] hover:bg-[#1fba57] active:scale-[0.98] text-white font-bold text-sm px-5 py-2.5 rounded-full shadow-[0_4px_12px_rgba(37,211,102,0.3)] hover:shadow-[0_6px_18px_rgba(37,211,102,0.4)] transition-all duration-200 cursor-pointer"
-                        >
-                          <WhatsAppIcon />
-                          Sacar turno
-                        </a>
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
+                ))}
               </div>
-            )
-          })}
+            </div>
+          </div>
+
+          {/* ── RIGHT: accordion ── */}
+          <div>
+            <div className="divide-y divide-gray-100 border border-gray-100 rounded-2xl overflow-hidden bg-white shadow-[0_4px_24px_rgba(10,36,99,0.06)]">
+              {especialidades.map((esp, i) => {
+                const items = getPracticasForEsp(esp.name)
+                const isOpen = openIdx === i
+
+                return (
+                  <div
+                    key={esp.name}
+                    className={`transition-colors duration-200 ${isOpen ? 'bg-gray-50' : 'bg-white hover:bg-gray-50/50'}`}
+                  >
+                    {/* Row header */}
+                    <button
+                      onClick={() => toggle(i)}
+                      className={`w-full flex items-center justify-between gap-4 px-5 py-4 text-left cursor-pointer transition-all duration-200 ${
+                        isOpen ? 'border-l-2 border-[#1E6BC6]' : 'border-l-2 border-transparent'
+                      }`}
+                      aria-expanded={isOpen}
+                    >
+                      <div className="flex items-center gap-2.5 min-w-0 flex-1">
+                        <span
+                          className={`font-semibold text-[15px] leading-snug transition-colors duration-200 ${
+                            isOpen ? 'text-[#0A2463]' : 'text-[#374151]'
+                          }`}
+                        >
+                          {esp.name}
+                        </span>
+                        {items.length > 0 && (
+                          <span className="shrink-0 text-[10px] font-semibold text-[#1E6BC6] bg-[#EFF6FF] px-2 py-0.5 rounded-full">
+                            {items.length} práctica{items.length !== 1 ? 's' : ''}
+                          </span>
+                        )}
+                      </div>
+                      <ChevronIcon open={isOpen} />
+                    </button>
+
+                    {/* Body */}
+                    <AnimatePresence initial={false}>
+                      {isOpen && (
+                        <motion.div
+                          key="body"
+                          initial={shouldReduce ? {} : { height: 0, opacity: 0 }}
+                          animate={{ height: 'auto', opacity: 1 }}
+                          exit={shouldReduce ? {} : { height: 0, opacity: 0 }}
+                          transition={{ duration: 0.25, ease: [0.4, 0, 0.2, 1] }}
+                          className="overflow-hidden border-l-2 border-[#1E6BC6]"
+                        >
+                          <div className="px-5 pb-5 pt-1">
+                            {items.length > 0 ? (
+                              <ul className="mb-4 space-y-2">
+                                {items.map((item) => (
+                                  <li key={item} className="flex items-start gap-2.5 text-sm text-[#6B7280]">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-[#56B4E9] shrink-0 mt-1.5" />
+                                    {item}
+                                  </li>
+                                ))}
+                              </ul>
+                            ) : (
+                              <p className="text-sm text-[#6B7280] mb-4">
+                                Consultá disponibilidad por WhatsApp
+                              </p>
+                            )}
+
+                            <a
+                              href={waEsp(esp.name)}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center gap-2 bg-[#25D366] hover:bg-[#1fba57] active:scale-[0.98] text-white font-bold text-sm px-5 py-2.5 rounded-full shadow-[0_4px_12px_rgba(37,211,102,0.3)] hover:shadow-[0_6px_18px_rgba(37,211,102,0.4)] transition-all duration-200 cursor-pointer"
+                            >
+                              <WhatsAppIcon />
+                              Sacar turno de {esp.name}
+                            </a>
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+                )
+              })}
+            </div>
+          </div>
         </div>
       </div>
     </div>
