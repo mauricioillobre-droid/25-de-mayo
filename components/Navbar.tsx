@@ -16,9 +16,9 @@ export default function Navbar() {
   const shouldReduce = useReducedMotion()
   const pathname = usePathname()
 
-  // Transparent effect only on the home page
-  const isHome = pathname === '/'
-  const isTransparent = isHome && !scrolled
+  // Transparent on pages that have a hero with background image
+  const hasHeroImage = pathname === '/' || pathname === '/especialidades' || pathname === '/contacto'
+  const isTransparent = hasHeroImage && !scrolled
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20)
