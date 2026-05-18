@@ -1,6 +1,6 @@
 'use server'
 
-import { createSupabaseServerClient, createSupabaseAnonClient } from '@/lib/supabase-server'
+import { createSupabaseServerClient, createSupabaseAdminClient } from '@/lib/supabase-server'
 
 export interface EspecialidadDB {
   id: string
@@ -165,7 +165,7 @@ export async function getSlotsParaEspecialidad(
 }
 
 export async function crearTurno(data: CrearTurnoData) {
-  const supabase = createSupabaseAnonClient()
+  const supabase = createSupabaseAdminClient()
 
   const [h, m] = data.horaInicio.split(':').map(Number)
   const endTotalMin = h * 60 + m + 30
