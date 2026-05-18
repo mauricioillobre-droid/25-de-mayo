@@ -17,7 +17,7 @@ export default function Navbar() {
   const pathname = usePathname()
 
   // Transparent on pages that have a hero with background image
-  const hasHeroImage = pathname === '/' || pathname === '/especialidades' || pathname === '/contacto'
+  const hasHeroImage = pathname === '/' || pathname === '/especialidades' || pathname === '/practicas' || pathname === '/contacto'
   const isTransparent = hasHeroImage && !scrolled
 
   useEffect(() => {

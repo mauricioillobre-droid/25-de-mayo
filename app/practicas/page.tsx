@@ -16,6 +16,7 @@ export default function PracticasPage() {
         eyebrow="ESTUDIOS Y PROCEDIMIENTOS"
         title="Prácticas y estudios"
         subtitle="Realizamos una amplia variedad de estudios y procedimientos directamente en el centro médico."
+        backgroundImage="/images/recepcion.jpeg"
       />
       <PracticasCatalog />
     </div>
