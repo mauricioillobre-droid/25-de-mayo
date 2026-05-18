@@ -186,6 +186,73 @@ export async function getSlotsParaEspecialidad(
     .sort((a, b) => a.hora.localeCompare(b.hora))
 }
 
+export async function getDiasDisponibles(
+  especialidadId: string
+): Promise<{ fechas: string[]; tieneFreqEspecial: boolean }> {
+  const supabase = await createSupabaseServerClient()
+
+  const { data: peData } = await supabase
+    .from('profesional_especialidades')
+    .select('profesionales!inner(id, activo)')
+    .eq('especialidad_id', especialidadId)
+
+  if (!peData) return { fechas: [], tieneFreqEspecial: false }
+
+  const profIds = (peData as any[])
+    .map((row) => row.profesionales)
+    .filter((p) => p.activo)
+    .map((p) => p.id)
+
+  if (profIds.length === 0) return { fechas: [], tieneFreqEspecial: false }
+
+  const { data: disp } = await supabase
+    .from('disponibilidad_base')
+    .select('dia_semana, frecuencia')
+    .in('profesional_id', profIds)
+    .eq('activo', true)
+
+  if (!disp || disp.length === 0) return { fechas: [], tieneFreqEspecial: false }
+
+  const tieneFreqEspecial = disp.some(
+    (d: any) => d.frecuencia && d.frecuencia !== 'semanal'
+  )
+
+  const frecuenciaValida = (frecuencia: string | null, semanaMes: number): boolean => {
+    const f = frecuencia ?? 'semanal'
+    if (f === 'semanal') return true
+    if (f === 'quincenal_1') return semanaMes === 1 || semanaMes === 3
+    if (f === 'quincenal_2') return semanaMes === 2 || semanaMes === 4
+    if (f === 'mensual_1') return semanaMes === 1
+    if (f === 'mensual_2') return semanaMes === 2
+    if (f === 'mensual_3') return semanaMes === 3
+    if (f === 'mensual_4') return semanaMes === 4
+    return true
+  }
+
+  const today = new Date()
+  today.setHours(12, 0, 0, 0)
+  const fechas: string[] = []
+
+  for (let i = 0; i < 60; i++) {
+    const date = new Date(today)
+    date.setDate(today.getDate() + i)
+    const jsDay = date.getDay()
+    if (jsDay === 0) continue
+    const diaSemana = jsDay - 1
+    const semanaMes = Math.ceil(date.getDate() / 7)
+    const hasAvailability = disp.some(
+      (d: any) => d.dia_semana === diaSemana && frecuenciaValida(d.frecuencia, semanaMes)
+    )
+    if (hasAvailability) {
+      fechas.push(
+        `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
+      )
+    }
+  }
+
+  return { fechas, tieneFreqEspecial }
+}
+
 export async function crearTurno(data: CrearTurnoData) {
   const supabase = createSupabaseAdminClient()
 

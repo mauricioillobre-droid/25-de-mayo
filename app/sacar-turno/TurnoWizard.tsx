@@ -7,6 +7,7 @@ import {
   EspecialidadDB,
   SlotConProfesional,
   getSlotsParaEspecialidad,
+  getDiasDisponibles,
   crearTurno,
 } from '@/app/actions/turnos'
 
@@ -110,14 +111,16 @@ function Stepper({ paso }: { paso: Paso }) {
 function CalendarPicker({
   value,
   onChange,
+  fechasHabilitadas,
 }: {
   value: string | null
   onChange: (d: string) => void
+  fechasHabilitadas: Set<string> | null
 }) {
   const today = new Date()
   today.setHours(0, 0, 0, 0)
   const maxDate = new Date(today)
-  maxDate.setDate(maxDate.getDate() + 30)
+  maxDate.setDate(maxDate.getDate() + 60)
 
   const [viewDate, setViewDate] = useState(() => new Date(today.getFullYear(), today.getMonth(), 1))
   const { year, month, daysInMonth, startOffset } = buildCalendar(viewDate)
@@ -177,7 +180,8 @@ function CalendarPicker({
           const isSunday = date.getDay() === 0
           const isPast = date < today
           const isFuture = date > maxDate
-          const disabled = isSunday || isPast || isFuture
+          const noDisponible = fechasHabilitadas !== null && !fechasHabilitadas.has(dateStr)
+          const disabled = isSunday || isPast || isFuture || noDisponible
           const isSelected = value === dateStr
           const isToday = dateStr === toDateStr(today.getFullYear(), today.getMonth(), today.getDate())
 
@@ -224,6 +228,8 @@ export default function TurnoWizard({ especialidades }: { especialidades: Especi
   const [slots, setSlots] = useState<SlotConProfesional[]>([])
   const [loadingSlots, setLoadingSlots] = useState(false)
   const [slotSeleccionado, setSlotSeleccionado] = useState<SlotConProfesional | null>(null)
+  const [fechasHabilitadas, setFechasHabilitadas] = useState<Set<string> | null>(null)
+  const [tieneFreqEspecial, setTieneFreqEspecial] = useState(false)
   const [nombre, setNombre] = useState('')
   const [telefono, setTelefono] = useState('')
   const [turnoId, setTurnoId] = useState<string | null>(null)
@@ -241,6 +247,18 @@ export default function TurnoWizard({ especialidades }: { especialidades: Especi
     document.addEventListener('mousedown', handler)
     return () => document.removeEventListener('mousedown', handler)
   }, [])
+
+  /* Load available dates when specialty changes */
+  useEffect(() => {
+    if (!especialidadId) return
+    setFechasHabilitadas(null)
+    setTieneFreqEspecial(false)
+    startTransition(async () => {
+      const { fechas, tieneFreqEspecial: freq } = await getDiasDisponibles(especialidadId)
+      setFechasHabilitadas(new Set(fechas))
+      setTieneFreqEspecial(freq)
+    })
+  }, [especialidadId])
 
   /* Load slots when fecha changes */
   useEffect(() => {
@@ -383,7 +401,12 @@ export default function TurnoWizard({ especialidades }: { especialidades: Especi
             <motion.div key="p2" {...animProps} transition={animTransition} className="p-6 md:p-8">
               <p className="text-[11px] font-bold text-[#1E6BC6] uppercase tracking-widest mb-1">PASO 2</p>
               <h2 className="text-xl font-black text-[#0A2463] mb-6">Elegí una fecha</h2>
-              <CalendarPicker value={fecha} onChange={setFecha} />
+              <CalendarPicker value={fecha} onChange={setFecha} fechasHabilitadas={fechasHabilitadas} />
+              {tieneFreqEspecial && (
+                <p className="mt-4 text-xs text-[#6B7280] bg-[#F4F6F9] rounded-xl px-4 py-3 leading-relaxed">
+                  Esta especialidad tiene turnos disponibles en fechas específicas. Los días habilitados están marcados en el calendario.
+                </p>
+              )}
               {fecha && (
                 <p className="mt-4 text-sm font-semibold text-[#1E6BC6] capitalize">
                   Seleccionaste: {formatFecha(fecha)}
