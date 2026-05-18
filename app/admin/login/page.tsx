@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
+import Image from 'next/image'
 import { createClient } from '@/lib/supabase'
 
 export default function AdminLoginPage() {
@@ -30,24 +31,36 @@ export default function AdminLoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#F4F6F9] flex items-center justify-center px-4">
+    <div
+      className="min-h-screen flex items-center justify-center px-4"
+      style={{ background: 'linear-gradient(135deg, #0A2463 0%, #0D3280 100%)' }}
+    >
       <div className="w-full max-w-sm">
         {/* Logo */}
-        <div className="text-center mb-8">
-          <div className="inline-flex flex-col items-center gap-1">
-            <span className="font-black text-2xl text-[#0A2463] tracking-tight">25 DE MAYO</span>
-            <span className="font-semibold text-xs text-[#1E6BC6] tracking-wide">Consultorios Médicos</span>
-          </div>
-          <p className="mt-3 text-[#6B7280] text-sm">Acceso al panel de gestión</p>
+        <div className="flex justify-center mb-8">
+          <Image
+            src="/images/logo.png"
+            alt="25 de Mayo Consultorios Médicos"
+            width={120}
+            height={60}
+            className="object-contain"
+            priority
+          />
         </div>
 
         {/* Card */}
-        <div className="bg-white rounded-2xl shadow-lg p-8">
-          <h1 className="text-lg font-black text-[#0A2463] mb-6">Iniciar sesión</h1>
+        <div className="bg-white rounded-2xl shadow-2xl p-8">
+          <div className="mb-6">
+            <h1 className="text-2xl font-black text-[#0A2463] text-balance">Bienvenido</h1>
+            <p className="text-sm text-gray-500 mt-1">Panel de gestión</p>
+          </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label htmlFor="email" className="block text-xs font-bold text-[#374151] uppercase tracking-wide mb-2">
+              <label
+                htmlFor="email"
+                className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2"
+              >
                 Email
               </label>
               <input
@@ -58,12 +71,15 @@ export default function AdminLoginPage() {
                 required
                 autoComplete="email"
                 placeholder="admin@ejemplo.com"
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm text-[#0A2463] placeholder-[#9CA3AF] focus:outline-none focus:ring-2 focus:ring-[#1E6BC6]/30 focus:border-[#1E6BC6] transition-all"
+                className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl text-sm text-[#0A2463] placeholder-gray-300 focus:outline-none focus:border-[#1E6BC6] transition-colors"
               />
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-xs font-bold text-[#374151] uppercase tracking-wide mb-2">
+              <label
+                htmlFor="password"
+                className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2"
+              >
                 Contraseña
               </label>
               <input
@@ -74,7 +90,7 @@ export default function AdminLoginPage() {
                 required
                 autoComplete="current-password"
                 placeholder="••••••••"
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm text-[#0A2463] placeholder-[#9CA3AF] focus:outline-none focus:ring-2 focus:ring-[#1E6BC6]/30 focus:border-[#1E6BC6] transition-all"
+                className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl text-sm text-[#0A2463] placeholder-gray-300 focus:outline-none focus:border-[#1E6BC6] transition-colors"
               />
             </div>
 
@@ -87,7 +103,7 @@ export default function AdminLoginPage() {
             <button
               type="submit"
               disabled={isPending}
-              className="w-full bg-[#0A2463] hover:bg-[#1756b8] disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-3 rounded-full transition-all duration-200 cursor-pointer min-h-[44px] flex items-center justify-center gap-2"
+              className="w-full bg-[#0A2463] hover:bg-[#0D3280] hover:shadow-lg active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-3 rounded-xl transition-all duration-200 cursor-pointer min-h-[44px] flex items-center justify-center gap-2"
             >
               {isPending ? (
                 <>

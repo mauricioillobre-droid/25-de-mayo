@@ -211,3 +211,27 @@ export async function getEspecialidadesAdmin() {
     .order('nombre')
   return data ?? []
 }
+
+export async function getTurnosEsteMes(): Promise<number> {
+  const supabase = await createSupabaseServerClient()
+  const now = new Date()
+  const firstDay = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-01`
+  const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0)
+  const lastDayStr = `${lastDay.getFullYear()}-${String(lastDay.getMonth() + 1).padStart(2, '0')}-${String(lastDay.getDate()).padStart(2, '0')}`
+  const { count } = await supabase
+    .from('turnos')
+    .select('id', { count: 'exact', head: true })
+    .gte('fecha', firstDay)
+    .lte('fecha', lastDayStr)
+  return count ?? 0
+}
+
+export async function getTotalPacientes(): Promise<number> {
+  const supabase = await createSupabaseServerClient()
+  const { data } = await supabase
+    .from('turnos')
+    .select('paciente_telefono')
+  if (!data) return 0
+  const unique = new Set(data.map((t: { paciente_telefono: string }) => t.paciente_telefono))
+  return unique.size
+}
