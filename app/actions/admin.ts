@@ -27,6 +27,7 @@ export interface DisponibilidadDia {
   hora_inicio: string
   hora_fin: string
   activo: boolean
+  frecuencia?: string
 }
 
 export interface BloqueoCompleto {
@@ -79,13 +80,25 @@ export async function getProfesionalesCompleto(): Promise<ProfesionalCompleto[]>
 
 export async function crearProfesional(
   nombre: string,
-  especialidadIds: string[]
+  especialidadIds: string[],
+  opts?: {
+    duracion_turno?: number
+    edad_minima?: number | null
+    edad_maxima?: number | null
+    notas?: string
+  }
 ) {
   const supabase = createSupabaseAdminClient()
 
   const { data: profesional, error: errP } = await supabase
     .from('profesionales')
-    .insert({ nombre })
+    .insert({
+      nombre,
+      duracion_turno: opts?.duracion_turno ?? 30,
+      edad_minima: opts?.edad_minima ?? null,
+      edad_maxima: opts?.edad_maxima ?? null,
+      notas: opts?.notas ?? null,
+    })
     .select('id')
     .single()
   if (errP || !profesional) throw new Error(errP?.message ?? 'Error al crear profesional')
@@ -117,7 +130,7 @@ export async function getDisponibilidadBase(profesionalId: string): Promise<Disp
   const supabase = await createSupabaseServerClient()
   const { data, error } = await supabase
     .from('disponibilidad_base')
-    .select('dia_semana, hora_inicio, hora_fin, activo')
+    .select('dia_semana, hora_inicio, hora_fin, activo, frecuencia')
     .eq('profesional_id', profesionalId)
     .order('dia_semana')
   if (error) return []
@@ -142,6 +155,7 @@ export async function guardarDisponibilidad(
       hora_inicio: d.hora_inicio,
       hora_fin: d.hora_fin,
       activo: true,
+      frecuencia: d.frecuencia ?? 'semanal',
     }))
 
   if (rows.length > 0) {

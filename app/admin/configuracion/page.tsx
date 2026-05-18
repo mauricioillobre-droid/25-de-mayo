@@ -54,6 +54,8 @@ function AdminHeader({ onLogout }: { onLogout: () => void }) {
 }
 
 /* ─── TAB: Profesionales ─────────────────────────────── */
+const DURACIONES = [10, 15, 20, 30, 45, 60]
+
 function TabProfesionales() {
   const [profesionales, setProfesionales] = useState<ProfesionalCompleto[]>([])
   const [especialidades, setEspecialidades] = useState<{ id: string; nombre: string }[]>([])
@@ -62,6 +64,10 @@ function TabProfesionales() {
   const [showForm, setShowForm] = useState(false)
   const [newNombre, setNewNombre] = useState('')
   const [newEspIds, setNewEspIds] = useState<string[]>([])
+  const [newDuracion, setNewDuracion] = useState(30)
+  const [newEdadMin, setNewEdadMin] = useState('')
+  const [newEdadMax, setNewEdadMax] = useState('')
+  const [newNotas, setNewNotas] = useState('')
   const [formError, setFormError] = useState<string | null>(null)
 
   const load = useCallback(() => {
@@ -86,9 +92,18 @@ function TabProfesionales() {
     if (!newNombre.trim()) { setFormError('El nombre es requerido.'); return }
     setFormError(null)
     startTransition(async () => {
-      await crearProfesional(newNombre.trim(), newEspIds)
+      await crearProfesional(newNombre.trim(), newEspIds, {
+        duracion_turno: newDuracion,
+        edad_minima: newEdadMin ? parseInt(newEdadMin) : null,
+        edad_maxima: newEdadMax ? parseInt(newEdadMax) : null,
+        notas: newNotas.trim() || undefined,
+      })
       setNewNombre('')
       setNewEspIds([])
+      setNewDuracion(30)
+      setNewEdadMin('')
+      setNewEdadMax('')
+      setNewNotas('')
       setShowForm(false)
       load()
     })
@@ -143,6 +158,52 @@ function TabProfesionales() {
               ))}
             </div>
           </div>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div>
+              <p className="text-xs font-semibold text-[#374151] mb-1">Duración del turno</p>
+              <select
+                value={newDuracion}
+                onChange={(e) => setNewDuracion(Number(e.target.value))}
+                className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm text-[#0A2463] focus:outline-none focus:ring-2 focus:ring-[#1E6BC6]/30 bg-white cursor-pointer"
+              >
+                {DURACIONES.map((d) => (
+                  <option key={d} value={d}>{d} min</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <p className="text-xs font-semibold text-[#374151] mb-1">Edad mínima</p>
+              <input
+                type="number"
+                min={0}
+                value={newEdadMin}
+                onChange={(e) => setNewEdadMin(e.target.value)}
+                placeholder="Sin límite"
+                className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm text-[#0A2463] focus:outline-none focus:ring-2 focus:ring-[#1E6BC6]/30 bg-white"
+              />
+            </div>
+            <div>
+              <p className="text-xs font-semibold text-[#374151] mb-1">Edad máxima</p>
+              <input
+                type="number"
+                min={0}
+                value={newEdadMax}
+                onChange={(e) => setNewEdadMax(e.target.value)}
+                placeholder="Sin límite"
+                className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm text-[#0A2463] focus:outline-none focus:ring-2 focus:ring-[#1E6BC6]/30 bg-white"
+              />
+            </div>
+          </div>
+          <div>
+            <p className="text-xs font-semibold text-[#374151] mb-1">Notas</p>
+            <textarea
+              value={newNotas}
+              onChange={(e) => setNewNotas(e.target.value)}
+              placeholder="Ej: Atiende cada 15 días, orden de llegada..."
+              rows={2}
+              className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm text-[#0A2463] focus:outline-none focus:ring-2 focus:ring-[#1E6BC6]/30 bg-white resize-none"
+            />
+          </div>
           {formError && <p className="text-xs text-red-600 font-semibold">{formError}</p>}
           <div className="flex gap-2">
             <button
@@ -153,7 +214,7 @@ function TabProfesionales() {
               {isPending ? 'Guardando...' : 'Guardar'}
             </button>
             <button
-              onClick={() => { setShowForm(false); setFormError(null); setNewNombre(''); setNewEspIds([]) }}
+              onClick={() => { setShowForm(false); setFormError(null); setNewNombre(''); setNewEspIds([]); setNewDuracion(30); setNewEdadMin(''); setNewEdadMax(''); setNewNotas('') }}
               className="text-xs font-semibold px-4 py-2 text-[#6B7280] hover:text-[#374151] cursor-pointer"
             >
               Cancelar
@@ -205,7 +266,7 @@ function TabDisponibilidad() {
   const [profesionales, setProfesionales] = useState<{ id: string; nombre: string }[]>([])
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [dias, setDias] = useState<DisponibilidadDia[]>(
-    DIAS_SEMANA.map((_, i) => ({ dia_semana: i, hora_inicio: '08:00', hora_fin: '18:00', activo: false }))
+    DIAS_SEMANA.map((_, i) => ({ dia_semana: i, hora_inicio: '08:00', hora_fin: '18:00', activo: false, frecuencia: 'semanal' }))
   )
   const [loading, setLoading] = useState(false)
   const [saved, setSaved] = useState(false)
@@ -225,7 +286,7 @@ function TabDisponibilidad() {
       const data = await getDisponibilidadBase(profId)
       const merged = DIAS_SEMANA.map((_, i) => {
         const found = data.find((d) => d.dia_semana === i)
-        return found ?? { dia_semana: i, hora_inicio: '08:00', hora_fin: '18:00', activo: false }
+        return found ?? { dia_semana: i, hora_inicio: '08:00', hora_fin: '18:00', activo: false, frecuencia: 'semanal' }
       })
       setDias(merged)
       setLoading(false)
@@ -304,9 +365,9 @@ function TabDisponibilidad() {
                       </span>
                     </div>
 
-                    {/* Time inputs */}
+                    {/* Time inputs + frecuencia */}
                     {dia.activo && (
-                      <div className="flex items-center gap-2">
+                      <div className="flex flex-wrap items-center gap-2">
                         <input
                           type="time"
                           value={dia.hora_inicio}
@@ -320,6 +381,19 @@ function TabDisponibilidad() {
                           onChange={(e) => updateDia(idx, 'hora_fin', e.target.value)}
                           className="border border-gray-200 rounded-lg px-2 py-1.5 text-sm text-[#0A2463] focus:outline-none focus:ring-2 focus:ring-[#1E6BC6]/30 cursor-pointer"
                         />
+                        <select
+                          value={dia.frecuencia ?? 'semanal'}
+                          onChange={(e) => updateDia(idx, 'frecuencia', e.target.value)}
+                          className="border border-gray-200 rounded-lg px-2 py-1.5 text-xs text-[#0A2463] focus:outline-none focus:ring-2 focus:ring-[#1E6BC6]/30 bg-white cursor-pointer"
+                        >
+                          <option value="semanal">Semanal (todas las semanas)</option>
+                          <option value="quincenal_1">Quincenal — 1ra quincena (sem. 1 y 3)</option>
+                          <option value="quincenal_2">Quincenal — 2da quincena (sem. 2 y 4)</option>
+                          <option value="mensual_1">1 vez por mes — semana 1</option>
+                          <option value="mensual_2">1 vez por mes — semana 2</option>
+                          <option value="mensual_3">1 vez por mes — semana 3</option>
+                          <option value="mensual_4">1 vez por mes — semana 4</option>
+                        </select>
                       </div>
                     )}
                   </div>

@@ -63,28 +63,50 @@ export async function getSlotsDisponibles(
   // schema: dia_semana 0=Lun … 5=Sab; Dom no existe
   if (jsDay === 0) return []
   const diaSemana = jsDay - 1
+  const semanaMes = Math.ceil(date.getDate() / 7)
 
-  const { data: disponibilidad } = await supabase
-    .from('disponibilidad_base')
-    .select('hora_inicio, hora_fin')
-    .eq('profesional_id', profesionalId)
-    .eq('dia_semana', diaSemana)
-    .eq('activo', true)
+  const [{ data: profesional }, { data: disponibilidad }] = await Promise.all([
+    supabase
+      .from('profesionales')
+      .select('duracion_turno')
+      .eq('id', profesionalId)
+      .single(),
+    supabase
+      .from('disponibilidad_base')
+      .select('hora_inicio, hora_fin, frecuencia')
+      .eq('profesional_id', profesionalId)
+      .eq('dia_semana', diaSemana)
+      .eq('activo', true),
+  ])
 
   if (!disponibilidad || disponibilidad.length === 0) return []
 
-  // Generate 30-min slots
+  const duracion: number = (profesional as any)?.duracion_turno ?? 30
+
+  const frecuenciaValida = (frecuencia: string | null): boolean => {
+    const f = frecuencia ?? 'semanal'
+    if (f === 'semanal') return true
+    if (f === 'quincenal_1') return semanaMes === 1 || semanaMes === 3
+    if (f === 'quincenal_2') return semanaMes === 2 || semanaMes === 4
+    if (f === 'mensual_1') return semanaMes === 1
+    if (f === 'mensual_2') return semanaMes === 2
+    if (f === 'mensual_3') return semanaMes === 3
+    if (f === 'mensual_4') return semanaMes === 4
+    return true
+  }
+
   const slots: string[] = []
   for (const d of disponibilidad) {
+    if (!frecuenciaValida((d as any).frecuencia)) continue
     const [sh, sm] = d.hora_inicio.split(':').map(Number)
     const [eh, em] = d.hora_fin.split(':').map(Number)
     let cur = sh * 60 + sm
     const end = eh * 60 + em
-    while (cur + 30 <= end) {
+    while (cur + duracion <= end) {
       const h = Math.floor(cur / 60).toString().padStart(2, '0')
       const m = (cur % 60).toString().padStart(2, '0')
       slots.push(`${h}:${m}`)
-      cur += 30
+      cur += duracion
     }
   }
 
