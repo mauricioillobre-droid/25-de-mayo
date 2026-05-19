@@ -1,7 +1,6 @@
 'use client'
 
 import Link from 'next/link'
-import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import { CalendarDays, Settings, LogOut } from 'lucide-react'
 
@@ -28,15 +27,9 @@ export function AdminSidebar({ userEmail, onLogout }: AdminSidebarProps) {
       style={{ background: 'linear-gradient(180deg, #0A2463 0%, #061840 100%)' }}
     >
       {/* Logo */}
-      <div className="flex justify-center items-center pt-6 pb-5 px-6 border-b border-white/10">
-        <Image
-          src="/images/logo.png"
-          alt="25 de Mayo Consultorios Médicos"
-          width={160}
-          height={80}
-          className="max-w-[160px] w-full object-contain brightness-0 invert"
-          priority
-        />
+      <div className="flex flex-col items-center pt-6 pb-5 px-6 border-b border-white/10">
+        <p className="font-bold text-white text-lg tracking-widest">25 DE MAYO</p>
+        <p className="text-white/60 text-xs tracking-wider">Consultorios Médicos</p>
       </div>
 
       {/* Navigation — aria-label identifies this landmark for screen readers */}
