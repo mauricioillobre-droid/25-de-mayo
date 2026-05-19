@@ -227,11 +227,18 @@ export async function eliminarProfesional(id: string) {
       .eq('profesional_id', id)
     if (e2) throw new Error(`Error al eliminar especialidades: ${e2.message}`)
 
+    // Nullify FK in turnos so existing appointments don't block the delete
     const { error: e3 } = await supabase
+      .from('turnos')
+      .update({ profesional_id: null })
+      .eq('profesional_id', id)
+    if (e3) throw new Error(`Error al desvincular turnos: ${e3.message}`)
+
+    const { error: e4 } = await supabase
       .from('profesionales')
       .delete()
       .eq('id', id)
-    if (e3) throw new Error(`Error al eliminar profesional: ${e3.message}`)
+    if (e4) throw new Error(`Error al eliminar profesional: ${e4.message}`)
   } catch (err) {
     throw err instanceof Error ? err : new Error('Error desconocido al eliminar profesional')
   }

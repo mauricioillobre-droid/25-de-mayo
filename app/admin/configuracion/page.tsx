@@ -42,6 +42,7 @@ function TabProfesionales() {
   const [newEdadMax, setNewEdadMax] = useState('')
   const [newNotas, setNewNotas] = useState('')
   const [formError, setFormError] = useState<string | null>(null)
+  const [deleteError, setDeleteError] = useState<string | null>(null)
 
   const load = useCallback(() => {
     startTransition(async () => {
@@ -63,9 +64,14 @@ function TabProfesionales() {
 
   const handleEliminar = (id: string, nombre: string) => {
     if (!window.confirm(`¿Eliminar a ${nombre}? Esta acción no se puede deshacer.`)) return
+    setDeleteError(null)
     startTransition(async () => {
-      await eliminarProfesional(id)
-      load()
+      try {
+        await eliminarProfesional(id)
+        load()
+      } catch (err) {
+        setDeleteError(err instanceof Error ? err.message : 'Error al eliminar el profesional.')
+      }
     })
   }
 
@@ -210,6 +216,12 @@ function TabProfesionales() {
             </button>
           </div>
         </div>
+      )}
+
+      {deleteError && (
+        <p className="mb-3 text-xs text-red-600 font-semibold bg-red-50 border border-red-200 rounded-xl px-4 py-3" role="alert">
+          {deleteError}
+        </p>
       )}
 
       <div className="space-y-2">
