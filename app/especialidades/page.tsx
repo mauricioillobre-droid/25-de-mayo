@@ -3,6 +3,7 @@ import { useState, useRef, useEffect } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { motion, AnimatePresence, useReducedMotion } from 'motion/react'
+import { Calendar } from 'lucide-react'
 import PageHero from '@/components/PageHero'
 import AnimateIn from '@/components/AnimateIn'
 import { especialidades } from '@/lib/data'
@@ -299,10 +300,11 @@ export default function EspecialidadesPage() {
                         Sacar turno por WhatsApp
                       </a>
                       <Link
-                        href="/practicas"
-                        className="inline-flex items-center justify-center gap-2 border border-white/25 hover:border-white/50 hover:bg-white/10 active:scale-[0.98] text-white font-semibold px-6 py-3 rounded-full transition-all duration-200 cursor-pointer text-[15px] min-h-[44px]"
+                        href={`/sacar-turno?especialidad=${encodeURIComponent(selected ?? '')}`}
+                        className="inline-flex items-center justify-center gap-2 bg-[#0A2463] hover:bg-[#1756b8] active:scale-[0.98] text-white font-semibold px-6 py-3 rounded-full transition-all duration-200 cursor-pointer text-[15px] min-h-[44px]"
                       >
-                        Ver prácticas disponibles
+                        <Calendar className="w-4 h-4 shrink-0" />
+                        Sacar turno online
                       </Link>
                     </div>
                   </div>

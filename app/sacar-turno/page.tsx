@@ -7,8 +7,16 @@ export const metadata = {
   description: 'Reservá tu turno online en segundos. Elegí tu especialidad, fecha y horario.',
 }
 
-export default async function SacarTurnoPage() {
-  const especialidades = await getEspecialidades()
+export default async function SacarTurnoPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ especialidad?: string }>
+}) {
+  const [especialidades, params] = await Promise.all([
+    getEspecialidades(),
+    searchParams,
+  ])
+  const preselectedNombre = params.especialidad ?? null
 
   return (
     <div className="min-h-screen bg-[#F4F6F9]">
@@ -19,7 +27,7 @@ export default async function SacarTurnoPage() {
         backgroundImage="/images/recepcion.jpeg"
       />
       <div className="max-w-2xl mx-auto px-4 py-12">
-        <TurnoWizard especialidades={especialidades} />
+        <TurnoWizard especialidades={especialidades} preselectedNombre={preselectedNombre} />
       </div>
     </div>
   )

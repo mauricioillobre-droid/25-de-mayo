@@ -226,7 +226,13 @@ const COBERTURAS = [
 ]
 
 /* ─── Main Wizard ────────────────────────────────────── */
-export default function TurnoWizard({ especialidades }: { especialidades: EspecialidadDB[] }) {
+export default function TurnoWizard({
+  especialidades,
+  preselectedNombre,
+}: {
+  especialidades: EspecialidadDB[]
+  preselectedNombre?: string | null
+}) {
   const shouldReduce = useReducedMotion()
   const spring = { type: 'spring' as const, stiffness: 68, damping: 18 }
   const [isPending, startTransition] = useTransition()
@@ -260,6 +266,19 @@ export default function TurnoWizard({ especialidades }: { especialidades: Especi
     document.addEventListener('mousedown', handler)
     return () => document.removeEventListener('mousedown', handler)
   }, [])
+
+  /* Preselect specialty from query param and jump to step 2 */
+  useEffect(() => {
+    if (!preselectedNombre) return
+    const match = especialidades.find(
+      (e) => e.nombre.toLowerCase() === preselectedNombre.toLowerCase()
+    )
+    if (match) {
+      setEspecialidadId(match.id)
+      setEspecialidadNombre(match.nombre)
+      setPaso(2)
+    }
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   /* Load available dates when specialty changes */
   useEffect(() => {
