@@ -7,6 +7,7 @@ import {
   getProfesionalesCompleto,
   toggleProfesionalActivo,
   crearProfesional,
+  eliminarProfesional,
   getDisponibilidadBase,
   guardarDisponibilidad,
   getBloqueos,
@@ -17,7 +18,7 @@ import {
   DisponibilidadDia,
   BloqueoCompleto,
 } from '@/app/actions/admin'
-import { Stethoscope, Clock, CalendarOff } from 'lucide-react'
+import { Stethoscope, Clock, CalendarOff, Trash2 } from 'lucide-react'
 import { AdminSidebar } from '@/components/admin/AdminSidebar'
 
 /* ─── Types ──────────────────────────────────────────── */
@@ -56,6 +57,14 @@ function TabProfesionales() {
   const handleToggle = (id: string, activo: boolean) => {
     startTransition(async () => {
       await toggleProfesionalActivo(id, !activo)
+      load()
+    })
+  }
+
+  const handleEliminar = (id: string, nombre: string) => {
+    if (!window.confirm(`¿Eliminar a ${nombre}? Esta acción no se puede deshacer.`)) return
+    startTransition(async () => {
+      await eliminarProfesional(id)
       load()
     })
   }
@@ -218,22 +227,32 @@ function TabProfesionales() {
                   <p className="text-xs text-gray-500 mt-0.5 truncate">{espNombres.join(', ')}</p>
                 )}
               </div>
-              <button
-                onClick={() => handleToggle(p.id, p.activo)}
-                disabled={isPending}
-                className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-[#1E6BC6]/30 disabled:opacity-50 ${
-                  p.activo ? 'bg-[#0A2463]' : 'bg-gray-200'
-                }`}
-                role="switch"
-                aria-checked={p.activo}
-                aria-label={`${p.activo ? 'Desactivar' : 'Activar'} ${p.nombre}`}
-              >
-                <span
-                  className={`pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
-                    p.activo ? 'translate-x-5' : 'translate-x-0'
+              <div className="flex items-center gap-2 shrink-0">
+                <button
+                  onClick={() => handleToggle(p.id, p.activo)}
+                  disabled={isPending}
+                  className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-[#1E6BC6]/30 disabled:opacity-50 ${
+                    p.activo ? 'bg-[#0A2463]' : 'bg-gray-200'
                   }`}
-                />
-              </button>
+                  role="switch"
+                  aria-checked={p.activo}
+                  aria-label={`${p.activo ? 'Desactivar' : 'Activar'} ${p.nombre}`}
+                >
+                  <span
+                    className={`pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
+                      p.activo ? 'translate-x-5' : 'translate-x-0'
+                    }`}
+                  />
+                </button>
+                <button
+                  onClick={() => handleEliminar(p.id, p.nombre)}
+                  disabled={isPending}
+                  aria-label={`Eliminar ${p.nombre}`}
+                  className="p-1.5 rounded-lg text-red-400 hover:text-red-600 hover:bg-red-50 transition-colors cursor-pointer disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-400/50"
+                >
+                  <Trash2 className="w-4 h-4" aria-hidden="true" />
+                </button>
+              </div>
             </div>
           )
         })}

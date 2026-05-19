@@ -25,6 +25,7 @@ export interface CrearTurnoData {
   horaInicio: string
   pacienteNombre: string
   pacienteTelefono: string
+  coberturaMedica?: string
 }
 
 export async function getEspecialidades(): Promise<EspecialidadDB[]> {
@@ -272,6 +273,7 @@ export async function crearTurno(data: CrearTurnoData) {
       paciente_nombre: data.pacienteNombre,
       paciente_telefono: data.pacienteTelefono,
       estado: 'confirmado',
+      cobertura_medica: data.coberturaMedica ?? 'particular',
     })
     .select()
     .single()

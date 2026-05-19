@@ -34,7 +34,7 @@ export function AdminSidebar({ userEmail, onLogout }: AdminSidebarProps) {
           alt="25 de Mayo Consultorios Médicos"
           width={160}
           height={80}
-          className="max-w-[160px] w-full object-contain"
+          className="max-w-[160px] w-full object-contain brightness-0 invert"
           priority
         />
       </div>

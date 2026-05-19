@@ -212,6 +212,48 @@ export async function getEspecialidadesAdmin() {
   return data ?? []
 }
 
+export async function eliminarProfesional(id: string) {
+  const supabase = createSupabaseAdminClient()
+  await supabase.from('disponibilidad_base').delete().eq('profesional_id', id)
+  await supabase.from('profesional_especialidades').delete().eq('profesional_id', id)
+  const { error } = await supabase.from('profesionales').delete().eq('id', id)
+  if (error) throw new Error(error.message)
+}
+
+export async function crearTurnoManual(data: {
+  nombre: string
+  telefono: string
+  especialidadId: string
+  profesionalId: string
+  fecha: string
+  horaInicio: string
+  coberturaMedica: string
+}) {
+  const supabase = createSupabaseAdminClient()
+  const { data: prof } = await supabase
+    .from('profesionales')
+    .select('duracion_turno')
+    .eq('id', data.profesionalId)
+    .single()
+  const duracion = (prof as any)?.duracion_turno ?? 30
+  const [h, m] = data.horaInicio.split(':').map(Number)
+  const endMin = h * 60 + m + duracion
+  const endH = Math.floor(endMin / 60).toString().padStart(2, '0')
+  const endM = (endMin % 60).toString().padStart(2, '0')
+  const { error } = await supabase.from('turnos').insert({
+    profesional_id: data.profesionalId,
+    especialidad_id: data.especialidadId,
+    fecha: data.fecha,
+    hora_inicio: data.horaInicio + ':00',
+    hora_fin: `${endH}:${endM}:00`,
+    paciente_nombre: data.nombre,
+    paciente_telefono: data.telefono,
+    estado: 'confirmado',
+    cobertura_medica: data.coberturaMedica,
+  })
+  if (error) throw new Error(error.message)
+}
+
 export async function getTurnosEsteMes(): Promise<number> {
   const supabase = await createSupabaseServerClient()
   const now = new Date()

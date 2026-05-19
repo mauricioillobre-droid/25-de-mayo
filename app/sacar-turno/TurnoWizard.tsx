@@ -213,6 +213,18 @@ function CalendarPicker({
   )
 }
 
+/* ─── Coberturas ─────────────────────────────────────── */
+const COBERTURAS = [
+  { value: 'particular', label: 'Particular' },
+  { value: 'ioma',       label: 'IOMA' },
+  { value: 'pami',       label: 'PAMI' },
+  { value: 'osde',       label: 'OSDE' },
+  { value: 'sancor',     label: 'SANCOR' },
+  { value: 'medife',     label: 'MEDIFÉ' },
+  { value: 'omint',      label: 'OMINT' },
+  { value: 'otra',       label: 'Otra obra social' },
+]
+
 /* ─── Main Wizard ────────────────────────────────────── */
 export default function TurnoWizard({ especialidades }: { especialidades: EspecialidadDB[] }) {
   const shouldReduce = useReducedMotion()
@@ -232,6 +244,7 @@ export default function TurnoWizard({ especialidades }: { especialidades: Especi
   const [tieneFreqEspecial, setTieneFreqEspecial] = useState(false)
   const [nombre, setNombre] = useState('')
   const [telefono, setTelefono] = useState('')
+  const [cobertura, setCobertura] = useState('particular')
   const [turnoId, setTurnoId] = useState<string | null>(null)
   const [submitError, setSubmitError] = useState<string | null>(null)
 
@@ -300,6 +313,7 @@ export default function TurnoWizard({ especialidades }: { especialidades: Especi
           horaInicio: slotSeleccionado.hora,
           pacienteNombre: nombre.trim(),
           pacienteTelefono: telefono.trim(),
+          coberturaMedica: cobertura,
         })
         setTurnoId(turno.id)
         setPaso(5)
@@ -513,6 +527,21 @@ export default function TurnoWizard({ especialidades }: { especialidades: Especi
                     required
                     className="w-full px-4 py-3 border border-gray-200 rounded-xl text-[15px] text-[#0A2463] placeholder-[#9CA3AF] focus:outline-none focus:ring-2 focus:ring-[#1E6BC6]/30 focus:border-[#1E6BC6] transition-all"
                   />
+                </div>
+                <div>
+                  <label htmlFor="cobertura" className="block text-xs font-bold text-[#374151] uppercase tracking-wide mb-2">
+                    Cobertura médica
+                  </label>
+                  <select
+                    id="cobertura"
+                    value={cobertura}
+                    onChange={(e) => setCobertura(e.target.value)}
+                    className="w-full px-4 py-3 border border-gray-200 rounded-xl text-[15px] text-[#0A2463] focus:outline-none focus:ring-2 focus:ring-[#1E6BC6]/30 focus:border-[#1E6BC6] transition-all bg-white cursor-pointer"
+                  >
+                    {COBERTURAS.map((c) => (
+                      <option key={c.value} value={c.value}>{c.label}</option>
+                    ))}
+                  </select>
                 </div>
               </div>
 

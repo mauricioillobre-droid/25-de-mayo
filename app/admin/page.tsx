@@ -22,9 +22,19 @@ import {
   ChevronRight,
   ChevronDown,
   Phone,
+  Plus,
+  X,
 } from 'lucide-react'
 import { AdminSidebar } from '@/components/admin/AdminSidebar'
 import { motion, useReducedMotion } from 'motion/react'
+import {
+  getEspecialidadesAdmin,
+  crearTurnoManual,
+} from '@/app/actions/admin'
+import {
+  getProfesionalesByEspecialidad,
+  getSlotsDisponibles,
+} from '@/app/actions/turnos'
 
 /* ─── Helpers ─────────────────────────────────────────── */
 function toDateStr(d: Date) {
@@ -319,6 +329,244 @@ function AgendaSkeleton() {
   )
 }
 
+/* ─── Coberturas ───────────────────────────────────────── */
+const COBERTURAS = [
+  { value: 'particular', label: 'Particular' },
+  { value: 'ioma',       label: 'IOMA' },
+  { value: 'pami',       label: 'PAMI' },
+  { value: 'osde',       label: 'OSDE' },
+  { value: 'sancor',     label: 'SANCOR' },
+  { value: 'medife',     label: 'MEDIFÉ' },
+  { value: 'omint',      label: 'OMINT' },
+  { value: 'otra',       label: 'Otra obra social' },
+]
+
+/* ─── Modal Agregar Turno ──────────────────────────────── */
+function ModalAgregarTurno({
+  defaultFecha,
+  onClose,
+  onSuccess,
+}: {
+  defaultFecha: string
+  onClose: () => void
+  onSuccess: () => void
+}) {
+  const [isPending, startTransition] = useTransition()
+  const [nombre, setNombre] = useState('')
+  const [telefono, setTelefono] = useState('')
+  const [espId, setEspId] = useState('')
+  const [profId, setProfId] = useState('')
+  const [fecha, setFecha] = useState(defaultFecha)
+  const [hora, setHora] = useState('')
+  const [cobertura, setCobertura] = useState('particular')
+  const [especialidades, setEspecialidades] = useState<{ id: string; nombre: string }[]>([])
+  const [profesionales, setProfesionales] = useState<{ id: string; nombre: string }[]>([])
+  const [slots, setSlots] = useState<string[]>([])
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    startTransition(async () => {
+      const esps = await getEspecialidadesAdmin()
+      setEspecialidades(esps)
+    })
+  }, [])
+
+  useEffect(() => {
+    if (!espId) { setProfesionales([]); setProfId(''); setSlots([]); setHora(''); return }
+    startTransition(async () => {
+      const profs = await getProfesionalesByEspecialidad(espId)
+      setProfesionales(profs)
+      setProfId('')
+      setSlots([])
+      setHora('')
+    })
+  }, [espId])
+
+  useEffect(() => {
+    if (!profId || !fecha) { setSlots([]); setHora(''); return }
+    startTransition(async () => {
+      const s = await getSlotsDisponibles(profId, fecha)
+      setSlots(s)
+      setHora('')
+    })
+  }, [profId, fecha])
+
+  const handleSubmit = () => {
+    if (!nombre.trim() || !telefono.trim() || !espId || !profId || !fecha || !hora) {
+      setError('Completá todos los campos requeridos.')
+      return
+    }
+    setError(null)
+    startTransition(async () => {
+      try {
+        await crearTurnoManual({
+          nombre: nombre.trim(),
+          telefono: telefono.trim(),
+          especialidadId: espId,
+          profesionalId: profId,
+          fecha,
+          horaInicio: hora,
+          coberturaMedica: cobertura,
+        })
+        onSuccess()
+        onClose()
+      } catch (e: unknown) {
+        setError((e as Error).message ?? 'Error al crear el turno.')
+      }
+    })
+  }
+
+  const handleBackdrop = (e: React.MouseEvent) => {
+    if (e.target === e.currentTarget) onClose()
+  }
+
+  const inputClass = 'w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm text-[#0A2463] focus:outline-none focus:ring-2 focus:ring-[#1E6BC6]/30 bg-white'
+
+  return (
+    <div
+      className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4"
+      onClick={handleBackdrop}
+      role="dialog"
+      aria-modal="true"
+      aria-label="Agregar turno manual"
+    >
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 sticky top-0 bg-white rounded-t-2xl">
+          <h2 className="text-lg font-bold text-[#0A2463]">Agregar turno</h2>
+          <button
+            onClick={onClose}
+            aria-label="Cerrar"
+            className="p-2 rounded-xl hover:bg-gray-100 motion-safe:transition-colors duration-150 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1E6BC6]/50"
+          >
+            <X className="w-4 h-4 text-gray-500" aria-hidden="true" />
+          </button>
+        </div>
+
+        <div className="p-6 space-y-4">
+          <div>
+            <label className="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1.5">
+              Nombre completo *
+            </label>
+            <input
+              type="text"
+              value={nombre}
+              onChange={(e) => setNombre(e.target.value)}
+              placeholder="Ej: María González"
+              className={inputClass}
+            />
+          </div>
+
+          <div>
+            <label className="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1.5">
+              Teléfono *
+            </label>
+            <input
+              type="tel"
+              value={telefono}
+              onChange={(e) => setTelefono(e.target.value.replace(/[^\d\s+()-]/g, ''))}
+              placeholder="Ej: 1122355689"
+              className={inputClass}
+            />
+          </div>
+
+          <div>
+            <label className="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1.5">
+              Especialidad *
+            </label>
+            <select
+              value={espId}
+              onChange={(e) => setEspId(e.target.value)}
+              className={inputClass + ' cursor-pointer'}
+            >
+              <option value="">Seleccioná una especialidad</option>
+              {especialidades.map((e) => (
+                <option key={e.id} value={e.id}>{e.nombre}</option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1.5">
+              Profesional *
+            </label>
+            <select
+              value={profId}
+              onChange={(e) => setProfId(e.target.value)}
+              disabled={!espId}
+              className={inputClass + ' cursor-pointer disabled:opacity-50'}
+            >
+              <option value="">
+                {espId ? 'Seleccioná un profesional' : 'Primero elegí una especialidad'}
+              </option>
+              {profesionales.map((p) => (
+                <option key={p.id} value={p.id}>{p.nombre}</option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1.5">
+              Fecha *
+            </label>
+            <input
+              type="date"
+              value={fecha}
+              onChange={(e) => setFecha(e.target.value)}
+              className={inputClass + ' cursor-pointer'}
+            />
+          </div>
+
+          <div>
+            <label className="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1.5">
+              Horario *
+            </label>
+            <select
+              value={hora}
+              onChange={(e) => setHora(e.target.value)}
+              disabled={!profId || !fecha}
+              className={inputClass + ' cursor-pointer disabled:opacity-50'}
+            >
+              <option value="">
+                {!profId ? 'Primero elegí un profesional' : slots.length === 0 ? 'Sin slots disponibles' : 'Seleccioná un horario'}
+              </option>
+              {slots.map((s) => (
+                <option key={s} value={s}>{s} hs</option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1.5">
+              Cobertura médica
+            </label>
+            <select
+              value={cobertura}
+              onChange={(e) => setCobertura(e.target.value)}
+              className={inputClass + ' cursor-pointer'}
+            >
+              {COBERTURAS.map((c) => (
+                <option key={c.value} value={c.value}>{c.label}</option>
+              ))}
+            </select>
+          </div>
+
+          {error && (
+            <p className="text-xs text-red-600 font-semibold" role="alert">{error}</p>
+          )}
+
+          <button
+            onClick={handleSubmit}
+            disabled={isPending}
+            className="w-full py-3 bg-[#0A2463] text-white font-bold rounded-xl hover:bg-[#1756b8] motion-safe:transition-colors duration-200 cursor-pointer disabled:opacity-50 min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1E6BC6]/50"
+          >
+            {isPending ? 'Guardando...' : 'Agregar turno'}
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 /* ─── Main Page ────────────────────────────────────────── */
 export default function AdminPage() {
   const router = useRouter()
@@ -332,6 +580,7 @@ export default function AdminPage() {
   const [totalPacientes, setTotalPacientes] = useState(0)
   // Separate loading flag so month/patient stats don't show "0" while fetching
   const [statsLoading, setStatsLoading] = useState(true)
+  const [showModal, setShowModal] = useState(false)
 
   useEffect(() => {
     const supabase = createClient()
@@ -470,16 +719,25 @@ export default function AdminPage() {
                   </span>
                 )}
               </div>
-              {(loading || isPending) && (
-                <svg
-                  className="w-4 h-4 motion-safe:animate-spin text-[#1E6BC6]"
-                  fill="none" viewBox="0 0 24 24"
-                  aria-label="Actualizando"
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={() => setShowModal(true)}
+                  className="flex items-center gap-1.5 text-xs font-bold px-3 py-2 rounded-xl bg-[#0A2463] text-white hover:bg-[#1756b8] motion-safe:transition-colors duration-150 cursor-pointer min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1E6BC6]/50"
                 >
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                </svg>
-              )}
+                  <Plus className="w-3.5 h-3.5" aria-hidden="true" />
+                  Agregar turno
+                </button>
+                {(loading || isPending) && (
+                  <svg
+                    className="w-4 h-4 motion-safe:animate-spin text-[#1E6BC6]"
+                    fill="none" viewBox="0 0 24 24"
+                    aria-label="Actualizando"
+                  >
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                  </svg>
+                )}
+              </div>
             </div>
 
             {/*
@@ -596,6 +854,14 @@ export default function AdminPage() {
           </div>
         </main>
       </div>
+
+      {showModal && (
+        <ModalAgregarTurno
+          defaultFecha={fecha}
+          onClose={() => setShowModal(false)}
+          onSuccess={() => fetchTurnos(fecha)}
+        />
+      )}
     </div>
   )
 }
