@@ -30,6 +30,7 @@ import { motion, useReducedMotion } from 'motion/react'
 import {
   getEspecialidadesAdmin,
   crearTurnoManual,
+  getDiasDisponiblesPorProfesional,
 } from '@/app/actions/admin'
 import {
   getProfesionalesByEspecialidad,
@@ -329,6 +330,111 @@ function AgendaSkeleton() {
   )
 }
 
+/* ─── Calendar helpers (modal) ────────────────────────── */
+function buildModalCalendar(refDate: Date) {
+  const year = refDate.getFullYear()
+  const month = refDate.getMonth()
+  const firstDay = new Date(year, month, 1).getDay()
+  const daysInMonth = new Date(year, month + 1, 0).getDate()
+  const startOffset = firstDay === 0 ? 6 : firstDay - 1
+  return { year, month, daysInMonth, startOffset }
+}
+
+function modalDateStr(y: number, m: number, d: number): string {
+  return `${y}-${String(m + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`
+}
+
+function ModalCalendarPicker({
+  value,
+  onChange,
+  fechasHabilitadas,
+}: {
+  value: string | null
+  onChange: (d: string) => void
+  fechasHabilitadas: Set<string> | null
+}) {
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+  const maxDate = new Date(today)
+  maxDate.setDate(maxDate.getDate() + 60)
+
+  const [viewDate, setViewDate] = useState(() => new Date(today.getFullYear(), today.getMonth(), 1))
+  const { year, month, daysInMonth, startOffset } = buildModalCalendar(viewDate)
+
+  const cells: (number | null)[] = [
+    ...Array(startOffset).fill(null),
+    ...Array.from({ length: daysInMonth }, (_, i) => i + 1),
+  ]
+  while (cells.length % 7 !== 0) cells.push(null)
+
+  return (
+    <div className="select-none">
+      <div className="flex items-center justify-between mb-3">
+        <button
+          onClick={() => setViewDate(new Date(year, month - 1, 1))}
+          className="p-1.5 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer text-[#0A2463]"
+          aria-label="Mes anterior"
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+          </svg>
+        </button>
+        <span className="font-bold text-[#0A2463] text-sm">{MESES[month]} {year}</span>
+        <button
+          onClick={() => setViewDate(new Date(year, month + 1, 1))}
+          className="p-1.5 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer text-[#0A2463]"
+          aria-label="Mes siguiente"
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+          </svg>
+        </button>
+      </div>
+
+      <div className="grid grid-cols-7 mb-1">
+        {['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'].map((d) => (
+          <div key={d} className="text-center text-[10px] font-bold text-gray-400 py-1">{d}</div>
+        ))}
+      </div>
+
+      <div className="grid grid-cols-7 gap-0.5">
+        {cells.map((day, idx) => {
+          if (!day) return <div key={idx} />
+          const dateStr = modalDateStr(year, month, day)
+          const date = new Date(year, month, day)
+          const isSunday = date.getDay() === 0
+          const isPast = date < today
+          const isFuture = date > maxDate
+          const noDisponible = fechasHabilitadas !== null && !fechasHabilitadas.has(dateStr)
+          const disabled = isSunday || isPast || isFuture || noDisponible
+          const isSelected = value === dateStr
+          const isToday = dateStr === modalDateStr(today.getFullYear(), today.getMonth(), today.getDate())
+          return (
+            <button
+              key={idx}
+              disabled={disabled}
+              onClick={() => !disabled && onChange(dateStr)}
+              className={`aspect-square rounded-lg text-xs font-semibold transition-all duration-150 cursor-pointer ${
+                isSelected
+                  ? 'bg-[#0A2463] text-white shadow-md'
+                  : disabled
+                  ? 'text-gray-200 cursor-not-allowed'
+                  : isToday
+                  ? 'bg-[#EFF6FF] text-[#1E6BC6] ring-1 ring-[#1E6BC6]/30 hover:bg-[#0A2463] hover:text-white'
+                  : 'text-[#374151] hover:bg-[#0A2463] hover:text-white'
+              }`}
+              aria-label={`${day} de ${MESES[month]}`}
+              aria-pressed={isSelected}
+            >
+              {day}
+            </button>
+          )
+        })}
+      </div>
+    </div>
+  )
+}
+
 /* ─── Coberturas ───────────────────────────────────────── */
 const COBERTURAS = [
   { value: 'particular', label: 'Particular' },
@@ -343,11 +449,9 @@ const COBERTURAS = [
 
 /* ─── Modal Agregar Turno ──────────────────────────────── */
 function ModalAgregarTurno({
-  defaultFecha,
   onClose,
   onSuccess,
 }: {
-  defaultFecha: string
   onClose: () => void
   onSuccess: () => void
 }) {
@@ -355,14 +459,34 @@ function ModalAgregarTurno({
   const [nombre, setNombre] = useState('')
   const [telefono, setTelefono] = useState('')
   const [espId, setEspId] = useState('')
+  const [espNombre, setEspNombre] = useState('')
   const [profId, setProfId] = useState('')
-  const [fecha, setFecha] = useState(defaultFecha)
+  const [profNombre, setProfNombre] = useState('')
+  const [fecha, setFecha] = useState<string | null>(null)
   const [hora, setHora] = useState('')
   const [cobertura, setCobertura] = useState('particular')
   const [especialidades, setEspecialidades] = useState<{ id: string; nombre: string }[]>([])
   const [profesionales, setProfesionales] = useState<{ id: string; nombre: string }[]>([])
+  const [fechasHabilitadas, setFechasHabilitadas] = useState<Set<string> | null>(null)
   const [slots, setSlots] = useState<string[]>([])
+  const [loadingSlots, setLoadingSlots] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [espOpen, setEspOpen] = useState(false)
+  const [profOpen, setProfOpen] = useState(false)
+  const [cobOpen, setCobOpen] = useState(false)
+  const espRef = useRef<HTMLDivElement>(null)
+  const profRef = useRef<HTMLDivElement>(null)
+  const cobRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (espRef.current && !espRef.current.contains(e.target as Node)) setEspOpen(false)
+      if (profRef.current && !profRef.current.contains(e.target as Node)) setProfOpen(false)
+      if (cobRef.current && !cobRef.current.contains(e.target as Node)) setCobOpen(false)
+    }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [])
 
   useEffect(() => {
     startTransition(async () => {
@@ -372,30 +496,47 @@ function ModalAgregarTurno({
   }, [])
 
   useEffect(() => {
-    if (!espId) { setProfesionales([]); setProfId(''); setSlots([]); setHora(''); return }
+    if (!espId) {
+      setProfesionales([]); setProfId(''); setProfNombre('')
+      setFechasHabilitadas(null); setFecha(null); setSlots([]); setHora('')
+      return
+    }
     startTransition(async () => {
       const profs = await getProfesionalesByEspecialidad(espId)
       setProfesionales(profs)
-      setProfId('')
-      setSlots([])
-      setHora('')
+      setProfId(''); setProfNombre(''); setFechasHabilitadas(null); setFecha(null); setSlots([]); setHora('')
     })
   }, [espId])
 
   useEffect(() => {
+    if (!profId) {
+      setFechasHabilitadas(null); setFecha(null); setSlots([]); setHora(''); return
+    }
+    startTransition(async () => {
+      const fechas = await getDiasDisponiblesPorProfesional(profId)
+      setFechasHabilitadas(new Set(fechas))
+      setFecha(null); setSlots([]); setHora('')
+    })
+  }, [profId])
+
+  useEffect(() => {
     if (!profId || !fecha) { setSlots([]); setHora(''); return }
+    setLoadingSlots(true)
     startTransition(async () => {
       const s = await getSlotsDisponibles(profId, fecha)
       setSlots(s)
       setHora('')
+      setLoadingSlots(false)
     })
   }, [profId, fecha])
 
+  const canSubmit =
+    nombre.trim().length > 1 &&
+    /^\d{6,}$/.test(telefono.replace(/\s/g, '')) &&
+    !!espId && !!profId && !!fecha && !!hora
+
   const handleSubmit = () => {
-    if (!nombre.trim() || !telefono.trim() || !espId || !profId || !fecha || !hora) {
-      setError('Completá todos los campos requeridos.')
-      return
-    }
+    if (!canSubmit) { setError('Completá todos los campos requeridos.'); return }
     setError(null)
     startTransition(async () => {
       try {
@@ -404,7 +545,7 @@ function ModalAgregarTurno({
           telefono: telefono.trim(),
           especialidadId: espId,
           profesionalId: profId,
-          fecha,
+          fecha: fecha!,
           horaInicio: hora,
           coberturaMedica: cobertura,
         })
@@ -416,154 +557,246 @@ function ModalAgregarTurno({
     })
   }
 
-  const handleBackdrop = (e: React.MouseEvent) => {
-    if (e.target === e.currentTarget) onClose()
-  }
-
-  const inputClass = 'w-full px-3 py-2.5 border border-gray-200 rounded-xl text-sm text-[#0A2463] focus:outline-none focus:ring-2 focus:ring-[#1E6BC6]/30 bg-white'
+  const lbl = 'block text-xs font-bold text-gray-400 uppercase tracking-widest mb-1.5'
+  const inp = 'w-full px-4 py-3 border border-gray-200 rounded-xl text-sm text-[#0A2463] placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-[#1E6BC6]/25 focus:border-[#1E6BC6] transition-all bg-white'
+  const dropBtn = (open: boolean, disabled?: boolean) =>
+    `w-full flex items-center justify-between gap-3 px-4 py-3 bg-white border rounded-xl text-left transition-all duration-200 cursor-pointer min-h-[44px] ${
+      disabled ? 'opacity-50 cursor-not-allowed' :
+      open ? 'border-[#1E6BC6] shadow-md ring-2 ring-[#1E6BC6]/15' :
+      'border-gray-200 shadow-sm hover:border-gray-300'
+    }`
+  const dropList = 'absolute z-20 mt-1 w-full bg-white border border-gray-200 rounded-xl shadow-xl overflow-hidden'
+  const dropItem = (sel: boolean) =>
+    `flex items-center gap-3 px-4 py-2.5 text-sm cursor-pointer select-none transition-colors duration-100 min-h-[40px] ${
+      sel ? 'bg-[#EFF6FF] text-[#1E6BC6] font-semibold' : 'text-[#374151] hover:bg-[#F0F7FF] hover:text-[#1E6BC6]'
+    }`
+  const checkMark = (
+    <svg className="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+    </svg>
+  )
 
   return (
-    <div
-      className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4"
-      onClick={handleBackdrop}
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.18 }}
+      className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+      onClick={(e) => { if (e.target === e.currentTarget) onClose() }}
       role="dialog"
       aria-modal="true"
-      aria-label="Agregar turno manual"
+      aria-label="Nuevo turno manual"
     >
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto">
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 sticky top-0 bg-white rounded-t-2xl">
-          <h2 className="text-lg font-bold text-[#0A2463]">Agregar turno</h2>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.25, ease: 'easeOut' }}
+        className="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Header */}
+        <div className="flex items-center justify-between px-6 py-5 border-b border-gray-100 sticky top-0 bg-white rounded-t-2xl z-10">
+          <div>
+            <h2 className="text-lg font-bold text-[#0A2463]">Nuevo turno</h2>
+            <p className="text-xs text-gray-400 mt-0.5">Completá los datos para agregar un turno manual</p>
+          </div>
           <button
             onClick={onClose}
             aria-label="Cerrar"
-            className="p-2 rounded-xl hover:bg-gray-100 motion-safe:transition-colors duration-150 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1E6BC6]/50"
+            className="p-2 rounded-xl hover:bg-gray-100 transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1E6BC6]/50"
           >
-            <X className="w-4 h-4 text-gray-500" aria-hidden="true" />
+            <X className="w-4 h-4 text-gray-400" aria-hidden="true" />
           </button>
         </div>
 
-        <div className="p-6 space-y-4">
+        <div className="p-6 space-y-5">
+
+          {/* Especialidad */}
           <div>
-            <label className="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1.5">
-              Nombre completo *
-            </label>
-            <input
-              type="text"
-              value={nombre}
-              onChange={(e) => setNombre(e.target.value)}
-              placeholder="Ej: María González"
-              className={inputClass}
-            />
+            <label className={lbl}>Especialidad *</label>
+            <div ref={espRef} className="relative">
+              <button type="button" onClick={() => { setEspOpen(v => !v); setProfOpen(false); setCobOpen(false) }} className={dropBtn(espOpen)}>
+                <span className={`text-sm font-semibold ${espNombre ? 'text-[#0A2463]' : 'text-gray-300'}`}>
+                  {espNombre || 'Seleccioná una especialidad'}
+                </span>
+                <ChevronDown className={`w-4 h-4 text-gray-400 shrink-0 transition-transform duration-200 ${espOpen ? 'rotate-180' : ''}`} aria-hidden="true" />
+              </button>
+              {espOpen && (
+                <div className={dropList}>
+                  <ul role="listbox" className="max-h-52 overflow-y-auto divide-y divide-gray-50 py-1">
+                    {especialidades.map((e) => (
+                      <li key={e.id} role="option" aria-selected={espId === e.id}
+                        onClick={() => { setEspId(e.id); setEspNombre(e.nombre); setEspOpen(false) }}
+                        className={dropItem(espId === e.id)}
+                      >
+                        {espId === e.id ? checkMark : <span className="w-3.5 shrink-0" />}
+                        {e.nombre}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
           </div>
 
+          {/* Profesional */}
           <div>
-            <label className="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1.5">
-              Teléfono *
-            </label>
-            <input
-              type="tel"
-              value={telefono}
-              onChange={(e) => setTelefono(e.target.value.replace(/[^\d\s+()-]/g, ''))}
-              placeholder="Ej: 1122355689"
-              className={inputClass}
-            />
+            <label className={lbl}>Profesional *</label>
+            <div ref={profRef} className="relative">
+              <button type="button" onClick={() => { if (!espId) return; setProfOpen(v => !v); setEspOpen(false); setCobOpen(false) }}
+                className={dropBtn(profOpen, !espId)}>
+                <span className={`text-sm font-semibold ${profNombre ? 'text-[#0A2463]' : 'text-gray-300'}`}>
+                  {profNombre || (espId ? 'Seleccioná un profesional' : 'Primero elegí una especialidad')}
+                </span>
+                <ChevronDown className={`w-4 h-4 text-gray-400 shrink-0 transition-transform duration-200 ${profOpen ? 'rotate-180' : ''}`} aria-hidden="true" />
+              </button>
+              {profOpen && espId && (
+                <div className={dropList}>
+                  <ul role="listbox" className="max-h-52 overflow-y-auto divide-y divide-gray-50 py-1">
+                    {profesionales.map((p) => (
+                      <li key={p.id} role="option" aria-selected={profId === p.id}
+                        onClick={() => { setProfId(p.id); setProfNombre(p.nombre); setProfOpen(false) }}
+                        className={dropItem(profId === p.id)}
+                      >
+                        {profId === p.id ? checkMark : <span className="w-3.5 shrink-0" />}
+                        {p.nombre}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
           </div>
 
+          {/* Fecha — calendar custom */}
           <div>
-            <label className="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1.5">
-              Especialidad *
-            </label>
-            <select
-              value={espId}
-              onChange={(e) => setEspId(e.target.value)}
-              className={inputClass + ' cursor-pointer'}
-            >
-              <option value="">Seleccioná una especialidad</option>
-              {especialidades.map((e) => (
-                <option key={e.id} value={e.id}>{e.nombre}</option>
-              ))}
-            </select>
+            <label className={lbl}>Fecha *</label>
+            {!profId ? (
+              <p className="text-sm text-gray-400 py-4 text-center bg-gray-50 rounded-xl border border-dashed border-gray-200">
+                Seleccioná un profesional primero
+              </p>
+            ) : isPending && !fechasHabilitadas ? (
+              <div className="py-8 flex justify-center">
+                <svg className="w-5 h-5 motion-safe:animate-spin text-[#1E6BC6]" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                </svg>
+              </div>
+            ) : (
+              <div className="border border-gray-200 rounded-xl p-4">
+                <ModalCalendarPicker value={fecha} onChange={setFecha} fechasHabilitadas={fechasHabilitadas} />
+              </div>
+            )}
           </div>
 
-          <div>
-            <label className="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1.5">
-              Profesional *
-            </label>
-            <select
-              value={profId}
-              onChange={(e) => setProfId(e.target.value)}
-              disabled={!espId}
-              className={inputClass + ' cursor-pointer disabled:opacity-50'}
-            >
-              <option value="">
-                {espId ? 'Seleccioná un profesional' : 'Primero elegí una especialidad'}
-              </option>
-              {profesionales.map((p) => (
-                <option key={p.id} value={p.id}>{p.nombre}</option>
-              ))}
-            </select>
-          </div>
+          {/* Horario — grid de botones */}
+          {fecha && (
+            <div>
+              <label className={lbl}>Horario *</label>
+              {loadingSlots || isPending ? (
+                <div className="flex items-center gap-2 py-3 text-[#1E6BC6]">
+                  <svg className="w-4 h-4 motion-safe:animate-spin" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                  </svg>
+                  <span className="text-sm font-semibold">Buscando disponibilidad...</span>
+                </div>
+              ) : slots.length === 0 ? (
+                <p className="text-sm text-gray-400 py-4 text-center bg-gray-50 rounded-xl border border-dashed border-gray-200">
+                  No hay turnos disponibles para este día
+                </p>
+              ) : (
+                <div className="grid grid-cols-4 gap-2">
+                  {slots.map((s) => (
+                    <button
+                      key={s}
+                      type="button"
+                      onClick={() => setHora(s)}
+                      className={`py-2.5 px-2 rounded-xl text-sm font-bold transition-all duration-150 cursor-pointer min-h-[44px] ${
+                        hora === s
+                          ? 'bg-[#0A2463] text-white shadow-md'
+                          : 'bg-[#F4F6F9] text-[#374151] hover:bg-[#EFF6FF] hover:text-[#1E6BC6]'
+                      }`}
+                      aria-pressed={hora === s}
+                    >
+                      {s}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
 
-          <div>
-            <label className="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1.5">
-              Fecha *
-            </label>
-            <input
-              type="date"
-              value={fecha}
-              onChange={(e) => setFecha(e.target.value)}
-              className={inputClass + ' cursor-pointer'}
-            />
-          </div>
+          {/* Datos del paciente */}
+          <div className="border-t border-gray-100 pt-5 space-y-4">
+            <div>
+              <label className={lbl}>Nombre completo *</label>
+              <input type="text" value={nombre} onChange={(e) => setNombre(e.target.value)}
+                placeholder="Ej: María González" className={inp} />
+            </div>
+            <div>
+              <label className={lbl}>Teléfono *</label>
+              <input type="tel" value={telefono}
+                onChange={(e) => setTelefono(e.target.value.replace(/[^\d\s+()-]/g, ''))}
+                placeholder="Ej: 1122355689" className={inp} />
+            </div>
 
-          <div>
-            <label className="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1.5">
-              Horario *
-            </label>
-            <select
-              value={hora}
-              onChange={(e) => setHora(e.target.value)}
-              disabled={!profId || !fecha}
-              className={inputClass + ' cursor-pointer disabled:opacity-50'}
-            >
-              <option value="">
-                {!profId ? 'Primero elegí un profesional' : slots.length === 0 ? 'Sin slots disponibles' : 'Seleccioná un horario'}
-              </option>
-              {slots.map((s) => (
-                <option key={s} value={s}>{s} hs</option>
-              ))}
-            </select>
-          </div>
-
-          <div>
-            <label className="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1.5">
-              Cobertura médica
-            </label>
-            <select
-              value={cobertura}
-              onChange={(e) => setCobertura(e.target.value)}
-              className={inputClass + ' cursor-pointer'}
-            >
-              {COBERTURAS.map((c) => (
-                <option key={c.value} value={c.value}>{c.label}</option>
-              ))}
-            </select>
+            {/* Cobertura */}
+            <div>
+              <label className={lbl}>Cobertura médica</label>
+              <div ref={cobRef} className="relative">
+                <button type="button" onClick={() => { setCobOpen(v => !v); setEspOpen(false); setProfOpen(false) }} className={dropBtn(cobOpen)}>
+                  <span className="text-sm font-semibold text-[#0A2463]">
+                    {COBERTURAS.find(c => c.value === cobertura)?.label ?? 'Particular'}
+                  </span>
+                  <ChevronDown className={`w-4 h-4 text-gray-400 shrink-0 transition-transform duration-200 ${cobOpen ? 'rotate-180' : ''}`} aria-hidden="true" />
+                </button>
+                {cobOpen && (
+                  <div className={dropList}>
+                    <ul role="listbox" className="max-h-52 overflow-y-auto divide-y divide-gray-50 py-1">
+                      {COBERTURAS.map((c) => (
+                        <li key={c.value} role="option" aria-selected={cobertura === c.value}
+                          onClick={() => { setCobertura(c.value); setCobOpen(false) }}
+                          className={dropItem(cobertura === c.value)}
+                        >
+                          {cobertura === c.value ? checkMark : <span className="w-3.5 shrink-0" />}
+                          {c.label}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
 
           {error && (
-            <p className="text-xs text-red-600 font-semibold" role="alert">{error}</p>
+            <p className="text-xs text-red-600 font-semibold bg-red-50 border border-red-100 rounded-xl px-4 py-3" role="alert">
+              {error}
+            </p>
           )}
+        </div>
 
+        {/* Footer */}
+        <div className="px-6 pb-6 flex gap-3">
           <button
-            onClick={handleSubmit}
-            disabled={isPending}
-            className="w-full py-3 bg-[#0A2463] text-white font-bold rounded-xl hover:bg-[#1756b8] motion-safe:transition-colors duration-200 cursor-pointer disabled:opacity-50 min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1E6BC6]/50"
+            type="button"
+            onClick={onClose}
+            className="flex-1 py-3 border-2 border-gray-200 text-gray-600 font-bold rounded-xl hover:border-gray-300 hover:text-gray-800 transition-all duration-150 cursor-pointer min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-300"
           >
-            {isPending ? 'Guardando...' : 'Agregar turno'}
+            Cancelar
+          </button>
+          <button
+            type="button"
+            onClick={handleSubmit}
+            disabled={!canSubmit || isPending}
+            className="flex-1 py-3 bg-[#0A2463] text-white font-bold rounded-xl hover:bg-[#1756b8] transition-all duration-150 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1E6BC6]/50"
+          >
+            {isPending ? 'Guardando...' : 'Guardar turno'}
           </button>
         </div>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   )
 }
 

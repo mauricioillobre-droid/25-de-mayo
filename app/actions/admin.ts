@@ -278,6 +278,47 @@ export async function crearTurnoManual(data: {
   if (error) throw new Error(error.message)
 }
 
+export async function getDiasDisponiblesPorProfesional(profesionalId: string): Promise<string[]> {
+  const supabase = await createSupabaseServerClient()
+  const { data: disp } = await supabase
+    .from('disponibilidad_base')
+    .select('dia_semana, frecuencia')
+    .eq('profesional_id', profesionalId)
+    .eq('activo', true)
+  if (!disp || disp.length === 0) return []
+
+  const frecuenciaValida = (frecuencia: string | null, semanaMes: number): boolean => {
+    const f = frecuencia ?? 'semanal'
+    if (f === 'semanal') return true
+    if (f === 'quincenal_1') return semanaMes === 1 || semanaMes === 3
+    if (f === 'quincenal_2') return semanaMes === 2 || semanaMes === 4
+    if (f === 'mensual_1') return semanaMes === 1
+    if (f === 'mensual_2') return semanaMes === 2
+    if (f === 'mensual_3') return semanaMes === 3
+    if (f === 'mensual_4') return semanaMes === 4
+    return true
+  }
+
+  const today = new Date()
+  today.setHours(12, 0, 0, 0)
+  const fechas: string[] = []
+  for (let i = 0; i < 60; i++) {
+    const date = new Date(today)
+    date.setDate(today.getDate() + i)
+    const jsDay = date.getDay()
+    if (jsDay === 0) continue
+    const diaSemana = jsDay - 1
+    const semanaMes = Math.ceil(date.getDate() / 7)
+    const ok = disp.some((d: any) => d.dia_semana === diaSemana && frecuenciaValida(d.frecuencia, semanaMes))
+    if (ok) {
+      fechas.push(
+        `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
+      )
+    }
+  }
+  return fechas
+}
+
 export async function getTurnosEsteMes(): Promise<number> {
   const supabase = await createSupabaseServerClient()
   const now = new Date()
