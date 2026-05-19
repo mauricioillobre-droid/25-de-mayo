@@ -32,9 +32,9 @@ export function AdminSidebar({ userEmail, onLogout }: AdminSidebarProps) {
         <Image
           src="/images/logo.png"
           alt="25 de Mayo Consultorios Médicos"
-          width={140}
-          height={70}
-          className="max-w-[140px] w-full object-contain"
+          width={160}
+          height={80}
+          className="max-w-[160px] w-full object-contain"
           priority
         />
       </div>
@@ -52,7 +52,7 @@ export function AdminSidebar({ userEmail, onLogout }: AdminSidebarProps) {
                 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:ring-offset-1 focus-visible:ring-offset-[#0A2463]
                 ${isActive
                   ? 'bg-white/10 border-[#1E6BC6] text-white shadow-sm'
-                  : 'border-transparent text-white/60 hover:text-white/90 hover:bg-white/5'
+                  : 'border-transparent text-white/60 hover:text-white hover:bg-white/10'
                 }`}
             >
               <Icon
@@ -71,10 +71,10 @@ export function AdminSidebar({ userEmail, onLogout }: AdminSidebarProps) {
           <div className="flex items-center gap-3 mb-4 min-w-0">
             {/* Initial avatar */}
             <div
-              className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center shrink-0 ring-1 ring-white/20"
+              className="w-8 h-8 rounded-full bg-[#1E6BC6] flex items-center justify-center shrink-0 ring-2 ring-white/20"
               aria-hidden="true"
             >
-              <span className="text-sm font-bold text-white/80">{avatarLetter}</span>
+              <span className="text-sm font-bold text-white">{avatarLetter}</span>
             </div>
             <p className="text-xs text-white/50 truncate" title={userEmail}>
               {userEmail}

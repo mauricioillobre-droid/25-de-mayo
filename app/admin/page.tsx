@@ -24,6 +24,7 @@ import {
   Phone,
 } from 'lucide-react'
 import { AdminSidebar } from '@/components/admin/AdminSidebar'
+import { motion, useReducedMotion } from 'motion/react'
 
 /* ─── Helpers ─────────────────────────────────────────── */
 function toDateStr(d: Date) {
@@ -67,7 +68,10 @@ const ESTADO_CONFIG = {
 function EstadoBadge({ estado }: { estado: TurnoCompleto['estado'] }) {
   const cfg = ESTADO_CONFIG[estado]
   return (
-    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold ${cfg.bg} ${cfg.text}`}>
+    <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold ${cfg.bg} ${cfg.text}`}>
+      {estado === 'confirmado' && (
+        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 motion-safe:animate-pulse shrink-0" aria-hidden="true" />
+      )}
       {cfg.label}
     </span>
   )
@@ -260,31 +264,35 @@ function StatCard({
   icon: React.ElementType
   color: string
   bgColor: string
-  accentColor: string  // top stripe color
+  accentColor: string
   loading?: boolean
 }) {
   return (
-    // hover:-translate-y-0.5 gives premium "lift" on hover
-    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden
+    <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden
       hover:shadow-md motion-safe:hover:-translate-y-0.5 motion-safe:transition-all duration-200">
-      {/* Colored top accent — instant category identification */}
-      <div className={`h-1 ${accentColor}`} aria-hidden="true" />
+      {/* 4px colored top accent */}
+      <div className={`h-[4px] ${accentColor}`} aria-hidden="true" />
       <div className="p-6">
-        <div className={`w-10 h-10 rounded-xl ${bgColor} flex items-center justify-center mb-4`}>
-          <Icon className={`w-5 h-5 ${color}`} aria-hidden="true" />
+        <div className="flex items-start justify-between mb-4">
+          <div>
+            {/* Skeleton while loading */}
+            {loading ? (
+              <div className="h-10 w-14 bg-gray-100 rounded-lg motion-safe:animate-pulse mb-2" aria-hidden="true" />
+            ) : (
+              <p
+                className={`text-4xl font-bold ${color} leading-none tabular-nums`}
+                aria-label={`${value} ${label}`}
+              >
+                {value}
+              </p>
+            )}
+            <p className="text-xs font-semibold uppercase tracking-widest text-slate-400 mt-2">{label}</p>
+          </div>
+          {/* Icon — top-right, 40×40, bg at 10% accent opacity */}
+          <div className={`w-10 h-10 rounded-xl ${bgColor} flex items-center justify-center shrink-0`}>
+            <Icon className={`w-5 h-5 ${color}`} aria-hidden="true" />
+          </div>
         </div>
-        {/* Skeleton while loading: avoids misleading "0" */}
-        {loading ? (
-          <div className="h-10 w-14 bg-gray-100 rounded-lg motion-safe:animate-pulse mb-1" aria-hidden="true" />
-        ) : (
-          <p
-            className={`text-4xl font-black ${color} leading-none tabular-nums`}
-            aria-label={`${value} ${label}`}
-          >
-            {value}
-          </p>
-        )}
-        <p className="text-[11px] text-gray-500 font-bold mt-2 uppercase tracking-wide">{label}</p>
       </div>
     </div>
   )
@@ -314,6 +322,7 @@ function AgendaSkeleton() {
 /* ─── Main Page ────────────────────────────────────────── */
 export default function AdminPage() {
   const router = useRouter()
+  const shouldReduce = useReducedMotion()
   const [fecha, setFecha] = useState(toDateStr(new Date()))
   const [turnos, setTurnos] = useState<TurnoCompleto[]>([])
   const [loading, setLoading] = useState(true)
@@ -425,40 +434,38 @@ export default function AdminPage() {
           </div>
 
           {/* Stats Grid — 3 cols desktop, 2 cols tablet */}
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8">
-            <StatCard
-              label="Total del día" value={total} loading={loading}
-              icon={Calendar}     color="text-[#0A2463]"  bgColor="bg-[#0A2463]/10"  accentColor="bg-[#0A2463]"
-            />
-            <StatCard
-              label="Confirmados" value={confirmados} loading={loading}
-              icon={CheckCircle}  color="text-emerald-600" bgColor="bg-emerald-100"  accentColor="bg-emerald-500"
-            />
-            <StatCard
-              label="Ausentes" value={ausentes} loading={loading}
-              icon={UserX}        color="text-amber-600"  bgColor="bg-amber-100"    accentColor="bg-amber-400"
-            />
-            <StatCard
-              label="Cancelados" value={cancelados} loading={loading}
-              icon={XCircle}      color="text-red-600"    bgColor="bg-red-100"      accentColor="bg-red-400"
-            />
-            <StatCard
-              label="Turnos este mes" value={turnosMes} loading={statsLoading}
-              icon={BarChart3}    color="text-violet-600" bgColor="bg-violet-100"   accentColor="bg-violet-500"
-            />
-            <StatCard
-              label="Total pacientes" value={totalPacientes} loading={statsLoading}
-              icon={Users}        color="text-teal-600"   bgColor="bg-teal-100"     accentColor="bg-teal-500"
-            />
-          </div>
+          {(() => {
+            const cards = [
+              { label: 'Total del día',   value: total,          icon: Calendar,    color: 'text-[#0A2463]',  bgColor: 'bg-[#0A2463]/10',   accentColor: 'bg-[#0A2463]',   loading },
+              { label: 'Confirmados',     value: confirmados,    icon: CheckCircle, color: 'text-emerald-600', bgColor: 'bg-emerald-500/10', accentColor: 'bg-emerald-500', loading },
+              { label: 'Ausentes',        value: ausentes,       icon: UserX,       color: 'text-amber-600',  bgColor: 'bg-amber-400/10',   accentColor: 'bg-amber-400',   loading },
+              { label: 'Cancelados',      value: cancelados,     icon: XCircle,     color: 'text-red-600',    bgColor: 'bg-red-400/10',     accentColor: 'bg-red-400',     loading },
+              { label: 'Turnos este mes', value: turnosMes,      icon: BarChart3,   color: 'text-violet-600', bgColor: 'bg-violet-500/10',  accentColor: 'bg-violet-500',  loading: statsLoading },
+              { label: 'Total pacientes', value: totalPacientes, icon: Users,       color: 'text-teal-600',   bgColor: 'bg-teal-500/10',    accentColor: 'bg-teal-500',    loading: statsLoading },
+            ]
+            return (
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8">
+                {cards.map((card, i) => (
+                  <motion.div
+                    key={card.label}
+                    initial={shouldReduce ? { opacity: 0 } : { opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: i * 0.05, duration: 0.3, ease: 'easeOut' }}
+                  >
+                    <StatCard {...card} />
+                  </motion.div>
+                ))}
+              </div>
+            )
+          })()}
 
           {/* Agenda del día */}
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
             <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <h2 className="font-bold text-[#0A2463] text-base">Agenda del día</h2>
+                <h2 className="text-xl font-bold text-[#0A2463]">Agenda del día</h2>
                 {!loading && (
-                  <span className="text-xs text-gray-500 font-semibold bg-gray-100 px-2.5 py-0.5 rounded-full tabular-nums">
+                  <span className="text-xs font-semibold bg-blue-100 text-blue-800 px-2.5 py-0.5 rounded-full tabular-nums">
                     {total} {total === 1 ? 'turno' : 'turnos'}
                   </span>
                 )}
@@ -494,9 +501,14 @@ export default function AdminPage() {
                 </div>
               ) : (
                 <div className="divide-y divide-gray-50">
-                  {turnos.map((turno) => (
-                    // Wrapper relative for the left status stripe
-                    <div key={turno.id} className="relative">
+                  {turnos.map((turno, idx) => (
+                    <motion.div
+                      key={turno.id}
+                      initial={shouldReduce ? { opacity: 0 } : { opacity: 0, y: 8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: idx * 0.05, duration: 0.25, ease: 'easeOut' }}
+                      className="relative"
+                    >
                       {/* Left stripe: instant visual reading of status without badge */}
                       <div
                         className={`absolute left-0 top-3 bottom-3 w-[3px] rounded-r ${ESTADO_CONFIG[turno.estado].stripe}`}
@@ -508,9 +520,9 @@ export default function AdminPage() {
                           hover:bg-gray-50/80 motion-safe:transition-colors duration-150
                           ${turno.estado === 'cancelado' || turno.estado === 'ausente' ? 'opacity-55' : ''}`}
                       >
-                        {/* Hora badge — monospace for alignment */}
+                        {/* Hora pill — monospace, pill shape, min-w */}
                         <div className="shrink-0">
-                          <span className="inline-flex items-center px-3 py-1.5 rounded-lg bg-[#0A2463] text-white font-mono text-sm font-bold leading-none">
+                          <span className="inline-flex items-center justify-center px-3 py-1.5 rounded-full bg-[#0A2463] text-white font-mono text-sm font-bold leading-none min-w-[4rem]">
                             {turno.hora_inicio.substring(0, 5)}
                           </span>
                         </div>
@@ -518,33 +530,33 @@ export default function AdminPage() {
                         {/* Patient info */}
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 flex-wrap mb-1">
-                            <span className="font-bold text-[#0A2463] text-sm">{turno.paciente_nombre}</span>
+                            <span className="text-base font-semibold text-slate-800">{turno.paciente_nombre}</span>
                             <EstadoBadge estado={turno.estado} />
                           </div>
-                          <div className="flex items-center gap-2 flex-wrap text-xs text-gray-500">
+                          <div className="flex items-center gap-2 flex-wrap text-sm text-slate-400">
                             <span>{turno.especialidades?.nombre ?? '—'}</span>
-                            <span className="text-gray-200" aria-hidden="true">·</span>
+                            <span aria-hidden="true">·</span>
                             <span>{turno.profesionales?.nombre ?? '—'}</span>
-                            <span className="text-gray-200" aria-hidden="true">·</span>
+                            <span aria-hidden="true">·</span>
                             <a
                               href={`tel:${turno.paciente_telefono}`}
                               className="flex items-center gap-1 hover:text-[#1E6BC6] motion-safe:transition-colors duration-150
                                 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#1E6BC6]/50 rounded"
                             >
-                              <Phone className="w-3 h-3" aria-hidden="true" />
+                              <Phone className="w-3.5 h-3.5" aria-hidden="true" />
                               {turno.paciente_telefono}
                             </a>
                           </div>
                         </div>
 
-                        {/* Action buttons — outlined style, min 44px touch target */}
+                        {/* Action buttons — compact outline, hover fills color */}
                         {turno.estado === 'confirmado' && (
                           <div className="flex items-center gap-2 shrink-0">
                             <button
                               onClick={() => cambiarEstado(turno.id, 'completado')}
                               disabled={isPending}
-                              className="text-xs font-bold px-3 py-2 rounded-xl border-2 border-emerald-200 text-emerald-700
-                                hover:bg-emerald-50 hover:border-emerald-300
+                              className="text-xs font-bold px-3 py-2 rounded-xl border-2 border-emerald-500 text-emerald-600
+                                hover:bg-emerald-500 hover:text-white
                                 motion-safe:transition-all duration-150 cursor-pointer disabled:opacity-50
                                 min-h-[44px]
                                 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400/50"
@@ -554,8 +566,8 @@ export default function AdminPage() {
                             <button
                               onClick={() => cambiarEstado(turno.id, 'ausente')}
                               disabled={isPending}
-                              className="text-xs font-bold px-3 py-2 rounded-xl border-2 border-amber-200 text-amber-700
-                                hover:bg-amber-50 hover:border-amber-300
+                              className="text-xs font-bold px-3 py-2 rounded-xl border-2 border-amber-400 text-amber-600
+                                hover:bg-amber-400 hover:text-white
                                 motion-safe:transition-all duration-150 cursor-pointer disabled:opacity-50
                                 min-h-[44px]
                                 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400/50"
@@ -565,8 +577,8 @@ export default function AdminPage() {
                             <button
                               onClick={() => cambiarEstado(turno.id, 'cancelado')}
                               disabled={isPending}
-                              className="text-xs font-bold px-3 py-2 rounded-xl border-2 border-red-200 text-red-600
-                                hover:bg-red-50 hover:border-red-300
+                              className="text-xs font-bold px-3 py-2 rounded-xl border-2 border-red-400 text-red-600
+                                hover:bg-red-400 hover:text-white
                                 motion-safe:transition-all duration-150 cursor-pointer disabled:opacity-50
                                 min-h-[44px]
                                 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-400/50"
@@ -576,7 +588,7 @@ export default function AdminPage() {
                           </div>
                         )}
                       </div>
-                    </div>
+                    </motion.div>
                   ))}
                 </div>
               )}
