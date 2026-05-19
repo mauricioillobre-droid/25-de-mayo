@@ -1090,7 +1090,6 @@ export default function AdminPage() {
 
       {showModal && (
         <ModalAgregarTurno
-          defaultFecha={fecha}
           onClose={() => setShowModal(false)}
           onSuccess={() => fetchTurnos(fecha)}
         />
