@@ -95,7 +95,7 @@ function TabProfesionales() {
         <p className="text-sm text-gray-500">{profesionales.length} profesionales registrados</p>
         <button
           onClick={() => setShowForm((v) => !v)}
-          className="text-xs font-bold px-4 py-2 bg-[#0A2463] text-white rounded-full hover:bg-[#1756b8] transition-colors cursor-pointer min-h-[36px]"
+          className="text-xs font-bold px-4 py-2 bg-[#0A2463] text-white rounded-full hover:bg-[#1756b8] motion-safe:transition-colors duration-200 cursor-pointer min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1E6BC6]/50"
         >
           + Agregar
         </button>
@@ -388,7 +388,7 @@ function TabDisponibilidad() {
                 <button
                   onClick={handleGuardar}
                   disabled={isPending}
-                  className="text-xs font-bold px-5 py-2.5 bg-[#0A2463] text-white rounded-full hover:bg-[#1756b8] transition-colors cursor-pointer disabled:opacity-50 min-h-[36px]"
+                  className="text-xs font-bold px-5 py-2.5 bg-[#0A2463] text-white rounded-full hover:bg-[#1756b8] motion-safe:transition-colors duration-200 cursor-pointer disabled:opacity-50 min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1E6BC6]/50"
                 >
                   {isPending ? 'Guardando...' : 'Guardar disponibilidad'}
                 </button>
@@ -534,7 +534,7 @@ function TabBloqueos() {
         <button
           onClick={handleCreate}
           disabled={isPending}
-          className="text-xs font-bold px-5 py-2.5 bg-[#0A2463] text-white rounded-full hover:bg-[#1756b8] transition-colors cursor-pointer disabled:opacity-50 min-h-[36px]"
+          className="text-xs font-bold px-5 py-2.5 bg-[#0A2463] text-white rounded-full hover:bg-[#1756b8] motion-safe:transition-colors duration-200 cursor-pointer disabled:opacity-50 min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1E6BC6]/50"
         >
           {isPending ? 'Guardando...' : 'Crear bloqueo'}
         </button>
@@ -605,38 +605,61 @@ export default function ConfiguracionPage() {
     weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
   })
 
+  const TAB_DESC: Record<Tab, string> = {
+    profesionales: 'Gestioná los profesionales, sus especialidades y duración de turno.',
+    disponibilidad: 'Configurá los días y horarios de atención por profesional.',
+    bloqueos: 'Bloqueá fechas por vacaciones, feriados u otras razones.',
+  }
+
   return (
-    <div className="flex min-h-screen bg-gray-50">
+    <div className="flex min-h-screen bg-[#F4F6F9]">
       <AdminSidebar userEmail={userEmail} onLogout={handleLogout} />
 
-      <div className="flex-1 flex flex-col" style={{ marginLeft: '16rem' }}>
-        {/* Page Header */}
-        <header className="bg-white border-b border-gray-100 px-8 py-4 flex items-center justify-between">
+      <div className="flex-1 flex flex-col overflow-x-hidden" style={{ marginLeft: '16rem' }}>
+        {/* Page Header — sticky to stay visible while scrolling forms */}
+        <header className="bg-white border-b border-gray-100 px-8 py-4 flex items-center justify-between sticky top-0 z-30">
           <h1 className="text-xl font-bold text-[#0A2463] text-balance">Ajustes</h1>
-          <span className="text-sm text-gray-400 capitalize">{currentDate}</span>
+          <span className="text-sm text-gray-400 capitalize hidden sm:block">{currentDate}</span>
         </header>
 
         <main className="flex-1 p-8">
-          {/* Tabs pill style */}
-          <div className="flex gap-1 bg-gray-100 rounded-xl p-1 mb-8 w-fit">
+          {/* Tabs — role="tablist" + aria-selected for screen readers */}
+          <div
+            role="tablist"
+            aria-label="Secciones de ajustes"
+            className="flex gap-1 bg-gray-100 rounded-xl p-1 mb-2 w-fit"
+          >
             {TABS.map(({ key, label, icon: Icon }) => (
               <button
                 key={key}
+                role="tab"
+                aria-selected={tab === key}
+                aria-controls={`tab-panel-${key}`}
                 onClick={() => setTab(key)}
-                className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-150 cursor-pointer min-h-[36px] ${
-                  tab === key
+                className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold
+                  motion-safe:transition-all duration-200 cursor-pointer min-h-[44px]
+                  focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1E6BC6]/50
+                  ${tab === key
                     ? 'bg-white text-[#0A2463] shadow-sm'
-                    : 'text-gray-500 hover:text-gray-700'
-                }`}
+                    : 'text-gray-500 hover:text-gray-700 hover:bg-white/50'
+                  }`}
               >
-                <Icon className="w-4 h-4" />
+                <Icon className="w-4 h-4" aria-hidden="true" />
                 {label}
               </button>
             ))}
           </div>
 
+          {/* Tab description — contextual guidance, reduces cognitive load */}
+          <p className="text-xs text-gray-400 mb-6 px-1">{TAB_DESC[tab]}</p>
+
           {/* Tab content */}
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+          <div
+            id={`tab-panel-${tab}`}
+            role="tabpanel"
+            aria-label={TABS.find((t) => t.key === tab)?.label}
+            className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6"
+          >
             {tab === 'profesionales' && <TabProfesionales />}
             {tab === 'disponibilidad' && <TabDisponibilidad />}
             {tab === 'bloqueos' && <TabBloqueos />}
