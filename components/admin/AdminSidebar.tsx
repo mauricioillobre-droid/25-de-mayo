@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { CalendarDays, Settings, LogOut } from 'lucide-react'
+import { IconList } from '@tabler/icons-react'
 
 interface AdminSidebarProps {
   userEmail?: string
@@ -13,9 +14,10 @@ export function AdminSidebar({ userEmail, onLogout }: AdminSidebarProps) {
   const pathname = usePathname()
 
   const navItems = [
-    { href: '/admin',                label: 'Agenda',  icon: CalendarDays },
-    { href: '/admin/configuracion',  label: 'Ajustes', icon: Settings },
-  ] as const
+    { href: '/admin',               label: 'Agenda',  icon: CalendarDays },
+    { href: '/admin/turnos',        label: 'Turnos',  icon: IconList },
+    { href: '/admin/configuracion', label: 'Ajustes', icon: Settings },
+  ]
 
   // Avatar: initial letter of email for quick user identification
   const avatarLetter = userEmail ? userEmail[0].toUpperCase() : '?'

@@ -274,6 +274,7 @@ export async function crearTurnoManual(data: {
     paciente_telefono: data.telefono,
     estado: 'confirmado',
     cobertura_medica: data.coberturaMedica,
+    origen: 'manual',
   })
   if (error) throw new Error(error.message)
 }

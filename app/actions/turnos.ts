@@ -274,6 +274,7 @@ export async function crearTurno(data: CrearTurnoData) {
       paciente_telefono: data.pacienteTelefono,
       estado: 'confirmado',
       cobertura_medica: data.coberturaMedica ?? 'particular',
+      origen: 'web',
     })
     .select()
     .single()
