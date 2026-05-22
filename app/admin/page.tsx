@@ -26,6 +26,7 @@ import {
   X,
 } from 'lucide-react'
 import { AdminSidebar } from '@/components/admin/AdminSidebar'
+import { QuickStatsSection } from '@/components/admin/QuickStatsSection'
 import { motion, useReducedMotion } from 'motion/react'
 import {
   getEspecialidadesAdmin,
@@ -940,6 +941,8 @@ export default function AdminPage() {
               </div>
             )
           })()}
+
+          <QuickStatsSection />
 
           {/* Agenda del día */}
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">

@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { CalendarDays, Settings, LogOut } from 'lucide-react'
+import { CalendarDays, Settings, LogOut, BarChart3 } from 'lucide-react'
 import { IconList } from '@tabler/icons-react'
 
 interface AdminSidebarProps {
@@ -15,6 +15,7 @@ export function AdminSidebar({ userEmail, onLogout }: AdminSidebarProps) {
 
   const navItems = [
     { href: '/admin',               label: 'Agenda',  icon: CalendarDays },
+    { href: '/admin/resumen',       label: 'Resumen', icon: BarChart3 },
     { href: '/admin/turnos',        label: 'Turnos',  icon: IconList },
     { href: '/admin/configuracion', label: 'Ajustes', icon: Settings },
   ]
